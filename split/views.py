@@ -7,3 +7,5 @@ class GroupView(ListView):
 
     template_name = 'movies.html'
 
+class Zuza(UpdateView):
+    pass
