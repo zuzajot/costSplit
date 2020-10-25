@@ -9,3 +9,5 @@ class GroupView(ListView):
 
 class SomeDetailView(DetailView):
     template_name = "details.html"
+class Zuza(UpdateView):
+    pass
