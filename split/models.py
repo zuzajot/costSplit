@@ -8,18 +8,17 @@ from django.dispatch import receiver
 
 class Profile(models.Model):
     user = models.OneToOneField(User,  on_delete=models.CASCADE)
-    balance = models.FloatField()
+    balance = models.FloatField(default=0.0)
+
+    def __str__(self):
+        return self.user.username
 
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+        profile = Profile(user=instance)
+        profile.save()
 
 
 class Group(models.Model):
@@ -27,11 +26,17 @@ class Group(models.Model):
     invite_url = models.CharField(max_length=200, unique=True)
     admin_id = models.ForeignKey("Profile", on_delete=models.DO_NOTHING)
 
+    def __str__(self):
+        return self.name
+
 
 class GroupUser(models.Model):
     group_id = models.ForeignKey("Group", on_delete=models.DO_NOTHING)
     user_id = models.ForeignKey("Profile", on_delete=models.DO_NOTHING)
-    balance = models.FloatField()
+    balance = models.FloatField(default=0.0)
+
+    def __str__(self):
+        return f"{self.group_id} - {self.user_id} - {self.balance}"
 
 
 class Cost(models.Model):
@@ -40,13 +45,22 @@ class Cost(models.Model):
     payer_id = models.ForeignKey("Profile", on_delete=models.DO_NOTHING)
     group_id = models.ForeignKey("Group", on_delete=models.DO_NOTHING)
 
+    def __str__(self):
+        return f"{self.title} - {self.amount} - {self.payer_id} - {self.group_id}"
+
 
 class CostUser(models.Model):
     cost_id = models.ForeignKey("Cost", on_delete=models.DO_NOTHING)
     user_id = models.ForeignKey("Profile", on_delete=models.DO_NOTHING)
+
+    def __str__(self):
+        return f"{self.user_id} - {self.cost_id}"
 
 
 class Payment(models.Model):
     amount = models.FloatField()
     group_id = models.ForeignKey("Group", on_delete=models.DO_NOTHING)
     user_id = models.ForeignKey("Profile", on_delete=models.DO_NOTHING)
+
+    def __str__(self):
+        return f"{self.user_id} - {self.group_id} - {self.amount}"
