@@ -1,8 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView, UpdateView, DetailView, CreateView, DeleteView
-from . import db_operations as db
+from django.views.generic import ListView
 from .models import GroupUser
 
 
