@@ -4,7 +4,26 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView, TemplateView
+
+from .forms import SignUpForm
 from .models import Profile, Group, GroupUser, Cost, CostUser, Payment
+from django.contrib.auth import login, authenticate
+from django.shortcuts import render, redirect
+
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('home')
+    else:
+        form = SignUpForm()
+    return render(request, 'signup.html', {'form': form})
 
 
 class HomeView(TemplateView):
@@ -38,7 +57,7 @@ class Login(LoginView):
 
 
 class SignUpView(CreateView):
-    form_class = UserCreationForm
+    form_class = SignUpForm
     success_url = reverse_lazy('login')
     template_name = 'signup.html'
 
