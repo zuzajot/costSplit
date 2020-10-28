@@ -29,11 +29,12 @@ class GroupCreateView(LoginRequiredMixin, CreateView):
     model = Group
     template_name = 'group_new.html'
     fields = ['name', 'invite_url', 'admin_id']
-    success_url = '/group'
+    success_url = ''
 
 
 class Login(LoginView):
     template_name = 'login.html'
+    success_url = reverse_lazy('home')
 
 
 class SignUpView(CreateView):
@@ -43,5 +44,4 @@ class SignUpView(CreateView):
 
 
 class TemplateView(LogoutView):
-    model = Group
     template_name = 'home.html'

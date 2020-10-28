@@ -25,7 +25,6 @@ class Group(models.Model):
     name = models.CharField(max_length=100)
     invite_url = models.CharField(max_length=200, unique=True)
     admin_id = models.ForeignKey("Profile", on_delete=models.DO_NOTHING)
-    slug = models.SlugField(unique=True)
 
     def __str__(self):
         return self.name
