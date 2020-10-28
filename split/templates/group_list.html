@@ -6,10 +6,10 @@
 </head>
 <body>
 {% for group in groups %}
-    <p>{{ group.name }}</p>
-    <p>{{ group.invite_url }}</p>
-    <p>{{ group.admin_id }}</p>
-    <p>----------------------------</p>
+    <p>{{ group.group_id.name }}</p>
+    <p>{{ group.user_id.user.username }}</p>
+    <p>{{ group.balance }}</p>
+    <p>---------------------------------------------</p>
 {% endfor %}
 </body>
 </html>

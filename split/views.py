@@ -10,7 +10,7 @@ from .models import GroupUser
 
 class GroupListView(LoginRequiredMixin, ListView):
     template_name = 'group_list.html'
-    context_object_name = 'groups'
+    context_object_name = "groups"
 
     def get_queryset(self):
-        return GroupUser.filter(user_id=self.request.user)
+        return GroupUser.objects.filter(user_id=self.request.user.profile)
