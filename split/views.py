@@ -1,11 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, CreateView
-from .models import GroupUser, Group
+from .models import GroupUser, Group, Payment, Cost, CostUser
 import string
 import random
-from django.urls import reverse
 
 # Create your views here.
 
@@ -38,3 +37,15 @@ class CreateGroupView(LoginRequiredMixin, CreateView):
         form.instance.save()
         GroupUser(user_id=self.request.user.profile, group_id=form.instance).save()
         return super().form_valid(form)
+
+
+@login_required()
+def group_view(request, id):
+    context = {}
+    context["group"] = get_object_or_404(Group, pk=id)
+    context["payments"] = Payment.objects.filter(group_id=id)
+    context["costs"] = Cost.objects.filter(group_id=id)
+    context["user_in_group"] = GroupUser.objects.get(user_id=request.user.profile, group_id=id)
+    template = "group_view.html"
+
+    return render(request, template_name=template, context=context)

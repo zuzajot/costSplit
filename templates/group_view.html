@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>group view test</title>
+</head>
+<body>
+<h1>{{ group.name }}</h1>
+<h2>Balance: {{ user_in_group.balance }}</h2>
+<h3>Payments:</h3>
+{% for payment in payments %}
+ <p>{{ payment.user_id.user.username }}</p>
+ <p>{{ payment.amount }}</p>
+{% endfor %}
+<p>--------------------------------------</p>
+<h3>Costs:</h3>
+{% for cost in costs %}
+ <p>{{ cost.payer_id.user.username }}</p>
+ <p>{{ cost.amount }}</p>
+ <p>{{ cost.title }}</p>
+{% endfor %}
+</body>
+</html>
