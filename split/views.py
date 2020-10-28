@@ -1,3 +1,6 @@
+import random
+import string
+
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
@@ -44,11 +47,34 @@ class GroupDetailView(DetailView):
     template_name = 'group_detail.html'
 
 
+class GroupListView(LoginRequiredMixin, ListView):
+    template_name = 'group_list.html'
+    context_object_name = "groups"
+
+    def get_queryset(self):
+        return GroupUser.objects.filter(user_id=self.request.user.profile)
+
+
 class GroupCreateView(LoginRequiredMixin, CreateView):
     model = Group
     template_name = 'group_new.html'
     fields = ['name', 'invite_url', 'admin_id']
     success_url = reverse_lazy('home')
+
+    def generate_unique_url(self, length):
+        urls = self.model.objects.all().values_list('invite_url', flat=True)
+        while True:
+            invite_url = ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
+            if invite_url in urls:
+                continue
+            return invite_url
+
+    def form_valid(self, form):
+        form.instance.admin_id = self.request.user.profile
+        form.instance.invite_url = self.generate_unique_url(10)
+        form.instance.save()
+        GroupUser(user_id=self.request.user.profile, group_id=form.instance).save()
+        return super().form_valid(form)
 
 
 class Login(LoginView):
@@ -64,4 +90,3 @@ class SignUpView(CreateView):
 
 class TemplateView(LogoutView):
     template_name = 'home.html'
-

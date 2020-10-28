@@ -17,12 +17,18 @@
     </form>
         <div class="Group">
             <ol>
-                {% for group in object_list %}
-                <li> <a href = "{% url 'group_detail'%}">{{group.name}}></a></li>
-                {% endfor %}
+                {% for group in groups %}
+    <p>{{ group.group_id.name }}</p>
+    <p>{{ group.user_id.user.username }}</p>
+    <p>{{ group.balance }}</p>
+    <p>{{ request.META.HTTP_HOST }}/inv/{{ group.group_id.invite_url }}</p>
+    <p>---------------------------------------------</p>
+{% endfor %}
+
+
         </ol>
         </div>
-        <p> <a href="{% url 'new_group' %}">Dodaj nową grupę </a></p>
+        <a href="{% url 'group_new' %}"> Dodaj nową grupę </a>
 
     <div class="pagination">
     <span class="step-links">
