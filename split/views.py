@@ -1,10 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, CreateView
 from .models import GroupUser, Group, Payment, Cost, CostUser
 import string
 import random
+from django.contrib import messages
 
 # Create your views here.
 
@@ -40,13 +42,31 @@ class CreateGroupView(LoginRequiredMixin, CreateView):
 
 
 @login_required()
-def group_view(request, id):
+def group_view(request, group_id):
     context = {}
-    context["group"] = get_object_or_404(Group, pk=id)
-    context["payments"] = Payment.objects.filter(group_id=id)
-    context["user_costs"] = CostUser.objects.filter(user_id=request.user.profile, cost_id__group_id=id)
-    context["balance"] = GroupUser.objects.get(user_id=request.user.profile, group_id=id)
-    context["users_in_group"] = GroupUser.objects.filter(group_id=id)
+    context["group"] = get_object_or_404(Group, pk=group_id)
+    context["payments"] = Payment.objects.filter(group_id=group_id)
+    context["user_costs"] = CostUser.objects.filter(user_id=request.user.profile, cost_id__group_id=group_id)
+    context["balance"] = GroupUser.objects.get(user_id=request.user.profile, group_id=group_id)
+    context["users_in_group"] = GroupUser.objects.filter(group_id=group_id)
     template = "group_view.html"
 
     return render(request, template_name=template, context=context)
+
+
+@login_required()
+def accept_or_decline_invitation(request, url):
+    try:
+        group = Group.objects.get(invite_url=url)
+        context = {"group": group}
+        template = "aod_invitation.html"
+    except Group.DoesNotExist as e:
+        messages.error(request, "Dana grupa nie istnieje!")
+        return redirect("group_list")
+
+    return render(request, template_name=template, context=context)
+
+
+
+
+

@@ -5,6 +5,13 @@
     <title>group list test</title>
 </head>
 <body>
+
+{% if messages %}
+{% for message in messages %}
+<p>{{ message }}</p>
+{% endfor %}
+{% endif %}
+
 {% for group in groups %}
     <a href="{% url 'group_view' group.group_id.id %}">
         <p>{{ group.group_id.name }}</p>
