@@ -58,15 +58,22 @@ def group_view(request, group_id):
 def accept_or_decline_invitation(request, url):
     try:
         group = Group.objects.get(invite_url=url)
-        context = {"group": group}
-        template = "aod_invitation.html"
     except Group.DoesNotExist as e:
         messages.error(request, "Dana grupa nie istnieje!")
         return redirect("group_list")
 
+    if GroupUser.objects.filter(user_id=request.user.profile, group_id=group):
+        messages.error(request, "Już jesteś w tej grupie!")
+        return redirect("group_list")
+
+    context = {"group": group}
+    template = "aod_invitation.html"
+
+    if request.POST.get("no"):
+        return redirect("group_list")
+    elif request.POST.get("yes"):
+        messages.success(request, "Dodano nową grupę")
+        GroupUser(user_id=request.user.profile, group_id=group).save()
+        return redirect("group_list")
+
     return render(request, template_name=template, context=context)
-
-
-
-
-

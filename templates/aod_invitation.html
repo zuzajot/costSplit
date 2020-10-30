@@ -6,5 +6,11 @@
 </head>
 <body>
 <h1>Nazwa grupy: {{ group.name }}</h1>
+  <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Sign me up!" name="yes"/>
+        <input type="submit" value="Get me back!" name="no"/>
+    </form>
 </body>
 </html>
