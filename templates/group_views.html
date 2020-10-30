@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %} Groups {% endblock %}
+
+{% block content %}
+    <form type='get' action="/groups" style ="margin:0">
+    <label for="search_box">Wyszukiwarka</label>
+    <input id="search_box" type="text" name="search_box" placeholder="Search"/>
+        <button id="search_submit" type="submit">Wyszukaj</button>
+    </form>
+        <div class="Group">
+            <ol>
+            {% for group in groups %}
+    <a href="{% url 'group_view' group.group_id.id %}">
+        <p>{{ group.group_id.name }}</p>
+    </a>
+    <p>{{ group.user_id.user.username }}</p>
+    <p>{{ group.balance }}</p>
+    <p>{{ request.META.HTTP_HOST }}/inv/{{ group.group_id.invite_url }}</p>
+
+    <p>---------------------------------------------</p>
+{% endfor %}
+
+
+        </ol>
+        </div>
+        <a href="{% url 'group_new' %}"> Dodaj nową grupę </a>
+
+    <div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+    </div>
+{% endblock %}

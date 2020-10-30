@@ -1,10 +1,11 @@
 import random
 import string
 
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView, TemplateView
 
@@ -30,8 +31,12 @@ def signup(request):
 
 
 class HomeView(TemplateView):
-    model = Group
     template_name = 'home.html'
+
+
+class GroupView(TemplateView):
+    model = Group
+    template_name = 'group_view.html'
     paginate_by = 10
 
     def get_queryset(self):
@@ -76,6 +81,18 @@ class GroupCreateView(LoginRequiredMixin, CreateView):
         GroupUser(user_id=self.request.user.profile, group_id=form.instance).save()
         return super().form_valid(form)
 
+@login_required()
+def group_view(request, id):
+    context = {}
+    context["group"] = get_object_or_404(Group, pk=id)
+    context["payments"] = Payment.objects.filter(group_id=id)
+    context["user_costs"] = CostUser.objects.filter(user_id=request.user.profile, cost_id__group_id=id)
+    context["balance"] = GroupUser.objects.get(user_id=request.user.profile, group_id=id)
+    context["users_in_group"] = GroupUser.objects.filter(group_id=id)
+    template = "group_view.html"
+
+    return render(request, template_name=template, context=context)
+
 
 class Login(LoginView):
     template_name = 'login.html'
@@ -90,3 +107,46 @@ class SignUpView(CreateView):
 
 class TemplateView(LogoutView):
     template_name = 'home.html'
+
+
+class CostCreateView(LoginRequiredMixin, CreateView):
+    model = Cost
+    template_name = 'cost_new.html'
+    fields = ['title', 'amount', 'payer_id', 'group_id']
+    success_url = reverse_lazy('home')
+
+
+class CostEditView(LoginRequiredMixin, UpdateView):
+    model = Cost
+    template_name = 'cost_edit.html'
+    fields = '__all__'
+    success_url = '/cost'
+
+
+class CostDeleteView(LoginRequiredMixin, DeleteView):
+    model = Cost
+    template_name = 'cost_delete.html'
+    success_url = '/cost'
+
+
+class CostDetailView(DetailView):
+    model = Cost
+    template_name = 'cost_view.html'
+
+
+class CostView(ListView):
+    model = Cost
+    template_name = 'costs_list.html'
+
+@login_required()
+def costs_list(request, id):
+    context = {}
+    context["group"] = get_object_or_404(Group, pk=id)
+    context["payments"] = Payment.objects.filter(group_id=id)
+    context["user_costs"] = CostUser.objects.filter(user_id=request.user.profile, cost_id__group_id=id)
+    context["balance"] = GroupUser.objects.get(user_id=request.user.profile, group_id=id)
+    context["users_in_group"] = GroupUser.objects.filter(group_id=id)
+    template = "costs_list.html"
+
+    return render(request, template_name=template, context=context)
+

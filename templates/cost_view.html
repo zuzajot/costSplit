@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %} {{cost.title}}{% endblock %}
+
+{% block content %}
+    <div class="Cost">
+        <h2>Wydatek: {{cost.title}}</h2>
+        <p>Kwota: {{cost.amount}}</p>
+        <p>Płacący: {{ cost.payer_id }}</p>
+        <p>Grupa: {{ cost.group_id }}</p>
+        <p>Uczestnicy kosztu: </p>
+        <p> <a href="{% url 'cost_edit' cost.title %}">Edytuj wydatek </a></p>
+        <p> <a href="{% url 'cost_delete' cost.title %}">Usuń wydatek </a></p>
+    </div>
+
+{% endblock %}

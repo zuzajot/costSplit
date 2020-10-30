@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %} Wydatki {% endblock %}
+
+{% block content %}
+
+    <form type='get' action="/cost" style ="margin:0">
+    </form>
+        <div class="Cost">
+            <ol>
+
+                {% for cost in group. %}
+                {% if request.user.profile == user.user_id.user.username %}
+                <li> <a href = "{% url 'cost_view' cost.pk%}">{{cost.title}}></a></li>
+                {% endif %}
+                {% endfor %}
+
+        </ol>
+        </div>
+        <p> <a href="{% url 'cost_new' %}">Dodaj nowy wydatek </a></p>
+
+
+
+</div>
+<a href = "{% url 'group_view' %}">Powrót do grupy {{group.title}}</a><br>
+<a href = "{% url 'home' %}">Powrót do strony głównej</a>
+{% endblock %}
