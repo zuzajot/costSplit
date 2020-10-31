@@ -7,8 +7,8 @@ urlpatterns = [
     path('groups/', views.GroupView.as_view(), name='group_view'),
     path('groups/view', views.GroupView.as_view(), name='group_views'),
     path('groups/new', views.GroupCreateView.as_view(), name='group_new'),
-    path('groups/<slug:pk>/', views.GroupDetailView.as_view(), name='group_detail'),
-    path('groups/<slug:pk>', views.group_view, name='group_view'),
+    path('groups/<int:pk>/', views.GroupDetailView.as_view(), name='group_detail'),
+    path('groups/<int:pk>', views.group_view, name='group_view'),
 
     path('login/', views.Login.as_view(), name='login'),
     path('logout/', views.TemplateView.as_view(), name='logout'),
@@ -16,7 +16,7 @@ urlpatterns = [
 
     path('cost/', views.CostView.as_view(), name='costs_list'),
     path('cost/new/', views.CostCreateView.as_view(), name='cost_new'),
-    path('cost/<slug:id>/edit', views.CostEditView.as_view(), name='cost_edit'),
-    path('cost/<slug:pk>/delete', views.CostDeleteView.as_view(), name='cost_delete'),
-    path('cost/<slug:pk>/', views.CostDetailView.as_view(), name='cost_view'),
+    path('cost/<int:pk>/edit', views.CostEditView.as_view(), name='cost_edit'),
+    path('cost/<int:pk>/delete', views.CostDeleteView.as_view(), name='cost_delete'),
+    path('cost/<int:pk>/', views.CostDetailView.as_view(), name='cost_view'),
 ]
