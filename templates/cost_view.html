@@ -9,8 +9,8 @@
         <p>Płacący: {{ cost.payer_id }}</p>
         <p>Grupa: {{ cost.group_id }}</p>
         <p>Uczestnicy kosztu: </p>
-        <p> <a href="{% url 'cost_edit' cost.title %}">Edytuj wydatek </a></p>
-        <p> <a href="{% url 'cost_delete' cost.title %}">Usuń wydatek </a></p>
+        <p> <a href="{% url 'cost_edit' cost.id %}">Edytuj wydatek </a></p>
+        <p> <a href="{% url 'cost_delete' cost.id %}">Usuń wydatek </a></p>
     </div>
 
 {% endblock %}

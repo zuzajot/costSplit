@@ -138,15 +138,4 @@ class CostView(ListView):
     model = Cost
     template_name = 'costs_list.html'
 
-@login_required()
-def costs_list(request, id):
-    context = {}
-    context["group"] = get_object_or_404(Group, pk=id)
-    context["payments"] = Payment.objects.filter(group_id=id)
-    context["user_costs"] = CostUser.objects.filter(user_id=request.user.profile, cost_id__group_id=id)
-    context["balance"] = GroupUser.objects.get(user_id=request.user.profile, group_id=id)
-    context["users_in_group"] = GroupUser.objects.filter(group_id=id)
-    template = "costs_list.html"
-
-    return render(request, template_name=template, context=context)
 

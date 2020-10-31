@@ -16,7 +16,7 @@ urlpatterns = [
 
     path('cost/', views.CostView.as_view(), name='costs_list'),
     path('cost/new/', views.CostCreateView.as_view(), name='cost_new'),
-    path('cost/<slug:pk>/edit', views.CostEditView.as_view(), name='cost_edit'),
+    path('cost/<slug:id>/edit', views.CostEditView.as_view(), name='cost_edit'),
     path('cost/<slug:pk>/delete', views.CostDeleteView.as_view(), name='cost_delete'),
     path('cost/<slug:pk>/', views.CostDetailView.as_view(), name='cost_view'),
 ]

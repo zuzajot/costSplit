@@ -8,11 +8,8 @@
     </form>
         <div class="Cost">
             <ol>
-
                 {% for cost in group. %}
-                {% if request.user.profile == user.user_id.user.username %}
                 <li> <a href = "{% url 'cost_view' cost.pk%}">{{cost.title}}></a></li>
-                {% endif %}
                 {% endfor %}
 
         </ol>
