@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>group list test</title>
+</head>
+<body>
+
+{% if messages %}
+{% for message in messages %}
+<p>{{ message }}</p>
+{% endfor %}
+{% endif %}
+
+{% for group in groups %}
+    <a href="{% url 'group_view' group.group_id.id %}">
+        <p>{{ group.group_id.name }}</p>
+    </a>
+    <p>{{ group.user_id.user.username }}</p>
+    <p>{{ group.balance }}</p>
+    <p>{{ request.META.HTTP_HOST }}/inv/{{ group.group_id.invite_url }}</p>
+
+    <p>---------------------------------------------</p>
+{% endfor %}
+
+<a href="{% url 'group_create' %}"> Dodaj nową grupę </a>
+</body>
+</html>

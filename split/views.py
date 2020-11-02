@@ -13,6 +13,7 @@ from .forms import SignUpForm
 from .models import Profile, Group, GroupUser, Cost, CostUser, Payment
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
+from django.contrib import messages
 
 
 def signup(request):
@@ -32,66 +33,6 @@ def signup(request):
 
 class HomeView(TemplateView):
     template_name = 'home.html'
-
-
-class GroupView(TemplateView):
-    model = Group
-    template_name = 'group_view.html'
-    paginate_by = 10
-
-    def get_queryset(self):
-        searching_name = self.request.GET.get('search_box', None)
-        if searching_name is not None:
-            return self.model.objects.all().filter(name__icontains=searching_name)
-        else:
-            return self.model.objects.all()
-
-
-class GroupDetailView(DetailView):
-    model = Group
-    template_name = 'group_detail.html'
-
-
-class GroupListView(LoginRequiredMixin, ListView):
-    template_name = 'group_list.html'
-    context_object_name = "groups"
-
-    def get_queryset(self):
-        return GroupUser.objects.filter(user_id=self.request.user.profile)
-
-
-class GroupCreateView(LoginRequiredMixin, CreateView):
-    model = Group
-    template_name = 'group_new.html'
-    fields = ['name', 'invite_url', 'admin_id']
-    success_url = reverse_lazy('home')
-
-    def generate_unique_url(self, length):
-        urls = self.model.objects.all().values_list('invite_url', flat=True)
-        while True:
-            invite_url = ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
-            if invite_url in urls:
-                continue
-            return invite_url
-
-    def form_valid(self, form):
-        form.instance.admin_id = self.request.user.profile
-        form.instance.invite_url = self.generate_unique_url(10)
-        form.instance.save()
-        GroupUser(user_id=self.request.user.profile, group_id=form.instance).save()
-        return super().form_valid(form)
-
-@login_required()
-def group_view(request, id):
-    context = {}
-    context["group"] = get_object_or_404(Group, pk=id)
-    context["payments"] = Payment.objects.filter(group_id=id)
-    context["user_costs"] = CostUser.objects.filter(user_id=request.user.profile, cost_id__group_id=id)
-    context["balance"] = GroupUser.objects.get(user_id=request.user.profile, group_id=id)
-    context["users_in_group"] = GroupUser.objects.filter(group_id=id)
-    template = "group_view.html"
-
-    return render(request, template_name=template, context=context)
 
 
 class Login(LoginView):
@@ -134,8 +75,77 @@ class CostDetailView(DetailView):
     template_name = 'cost_view.html'
 
 
-class CostView(ListView):
-    model = Cost
+class CostListView(LoginRequiredMixin, ListView):
     template_name = 'costs_list.html'
+    context_object_name = "cost"
+
+    def get_queryset(self):
+        return CostUser.objects.filter(user_id=self.request.user.profile)
 
 
+class GroupListView(LoginRequiredMixin, ListView):
+    template_name = 'group_list.html'
+    context_object_name = "groups"
+
+    def get_queryset(self):
+        return GroupUser.objects.filter(user_id=self.request.user.profile)
+
+
+class CreateGroupView(LoginRequiredMixin, CreateView):
+    template_name = "create_group.html"
+    model = Group
+    fields = ["name"]
+    success_url = "/groups"
+
+    def generate_unique_url(self, length):
+        urls = self.model.objects.all().values_list('invite_url', flat=True)
+        while True:
+            invite_url = ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
+            if invite_url in urls:
+                continue
+            return invite_url
+
+    def form_valid(self, form):
+        form.instance.admin_id = self.request.user.profile
+        form.instance.invite_url = self.generate_unique_url(10)
+        form.instance.save()
+        GroupUser(user_id=self.request.user.profile, group_id=form.instance).save()
+        return super().form_valid(form)
+
+
+@login_required()
+def group_view(request, group_id):
+    context = {}
+    context["group"] = get_object_or_404(Group, pk=group_id)
+    context["payments"] = Payment.objects.filter(group_id=group_id)
+    context["user_costs"] = CostUser.objects.filter(user_id=request.user.profile, cost_id__group_id=group_id)
+    context["balance"] = GroupUser.objects.get(user_id=request.user.profile, group_id=group_id)
+    context["users_in_group"] = GroupUser.objects.filter(group_id=group_id)
+    template = "group_view.html"
+
+    return render(request, template_name=template, context=context)
+
+
+@login_required()
+def accept_or_decline_invitation(request, url):
+    try:
+        group = Group.objects.get(invite_url=url)
+    except Group.DoesNotExist as e:
+        messages.error(request, "Dana grupa nie istnieje!")
+        return redirect("group_list")
+
+    if GroupUser.objects.filter(user_id=request.user.profile, group_id=group):
+        messages.error(request, "Już jesteś w tej grupie!")
+        return redirect("group_list")
+
+    context = {"group": group}
+    template = "aod_invitation.html"
+
+    if request.POST.get("no"):
+        return redirect("group_list")
+    elif request.POST.get("yes"):
+        messages.success(request, "Dodano nową grupę")
+        GroupUser(user_id=request.user.profile, group_id=group).save()
+        return redirect("group_list")
+
+    return render(request, template_name=template, context=context)

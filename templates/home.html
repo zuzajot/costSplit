@@ -7,7 +7,7 @@
 
             <div> <p> Hi {{ user.username }}! <a href="{% url 'logout' %}">Log Out</a> </p></div>
 
-            <div class="groupmain"><a href="{% url 'group_views' %}">Twoje grupy</a></div>
+            <div class="groupmain"><a href="{% url 'group_list' %}">Twoje grupy</a></div>
     {% else %}
           <p>You are not logged in</p>
           <a href="{% url 'login' %}">Log In</a>

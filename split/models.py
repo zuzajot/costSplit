@@ -1,11 +1,7 @@
-from django.contrib.auth.forms import UserCreationForm
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils import timezone
-from django.utils.text import slugify
-
 
 # Create your models here.
 
@@ -45,7 +41,7 @@ class GroupUser(models.Model):
 
 class Cost(models.Model):
     title = models.CharField(max_length=100)
-    amount = models.DecimalField(max_digits=15, decimal_places=2)
+    amount = models.FloatField()
     payer_id = models.ForeignKey("Profile", on_delete=models.DO_NOTHING)
     group_id = models.ForeignKey("Group", on_delete=models.DO_NOTHING)
 
