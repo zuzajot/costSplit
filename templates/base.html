@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block  title %} Cost Split {% endblock %}</title>
+    <style>
+        .naglowek{background-color: blue; color: yellow; text-align: center}
+    </style>
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}"/>
+</head>
+<body>
+<div class="naglowek">
+    <h1>Cost Split</h1>
+</div>
+<div id="content">
+    {% block content %}{% endblock %}
+</div>
+</body>
+</html>

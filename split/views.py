@@ -7,6 +7,22 @@ from .models import GroupUser, Group, Payment, Cost, CostUser
 import string
 import random
 from django.contrib import messages
+import random
+import string
+
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView, LogoutView
+from django.shortcuts import render, get_object_or_404
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView, TemplateView
+
+from .forms import SignUpForm, UsersCostForm
+from .models import Profile, Group, GroupUser, Cost, CostUser, Payment
+from django.contrib.auth import login, authenticate
+from django.shortcuts import render, redirect
+from django.contrib import messages
 
 # Create your views here.
 
@@ -75,5 +91,82 @@ def accept_or_decline_invitation(request, url):
         messages.success(request, "Dodano nową grupę")
         GroupUser(user_id=request.user.profile, group_id=group).save()
         return redirect("group_list")
+
+    return render(request, template_name=template, context=context)
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('home')
+    else:
+        form = SignUpForm()
+    return render(request, 'signup.html', {'form': form})
+
+
+class HomeView(TemplateView):
+    template_name = 'home.html'
+
+
+class Login(LoginView):
+    template_name = 'login.html'
+    success_url = reverse_lazy('home')
+
+
+class SignUpView(CreateView):
+    form_class = SignUpForm
+    success_url = reverse_lazy('login')
+    template_name = 'signup.html'
+
+
+class TemplateView(LogoutView):
+    template_name = 'home.html'
+
+
+class CostCreateView(LoginRequiredMixin, CreateView):
+    model = Cost
+    template_name = 'cost_new.html'
+    form_class = UsersCostForm
+    success_url = reverse_lazy('home')
+
+    def get_form_kwargs(self):
+        """ Passes the request object to the form class.
+         This is necessary to only display members that belong to a given user"""
+
+        kwargs = super(CostCreateView, self).get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
+
+class CostEditView(LoginRequiredMixin, UpdateView):
+    model = Cost
+    template_name = 'cost_edit.html'
+    fields = '__all__'
+    success_url = '/cost'
+
+
+class CostDeleteView(LoginRequiredMixin, DeleteView):
+    model = Cost
+    template_name = 'cost_delete.html'
+    success_url = '/cost'
+
+
+class CostDetailView(DetailView):
+    model = Cost
+    template_name = 'cost_view.html'
+
+
+@login_required()
+def cost_view(request, cost_id):
+    context = {}
+    context["cost"] = get_object_or_404(Group, pk=cost_id)
+    context["user_costs"] = CostUser.objects.filter(user_id=request.user.profile, cost_id_=cost_id)
+    context["balance"] = GroupUser.objects.get(user_id=request.user.profile, cost_id=cost_id)
+    template = "cost_view.html"
 
     return render(request, template_name=template, context=context)
