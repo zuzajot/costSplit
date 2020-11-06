@@ -4,16 +4,30 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block  title %} Cost Split {% endblock %}</title>
-    <style>
-        .naglowek{background-color: blue; color: yellow; text-align: center}
-    </style>
+
     <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}"/>
 </head>
 <body>
-<div class="naglowek">
-    <h1>Cost Split</h1>
+<div class="top-bar">
+    <a href="{% url 'home' %}">
+    <img src="{% static 'img/logo.png' %}" alt ="CS logo" height="70px">
+        </a>
+    <!-- "if request.user.is_authenticated" -->
+<div class="userinfodiv">
+    <span class="userinfo">Hej,
+        USERNAME
+        <span class="balance">+XX.XX</span>
+      <a href="{% url 'logout' %}">wyloguj</a></span>
+
+      <!-- #/
+      {
+      % else %}  <a href="/login">Log In</a> {%
+       endif %} -->
+    </div>
 </div>
-<div id="content">
+
+
+<div id="content" class="content">
     {% block content %}{% endblock %}
 </div>
 </body>
