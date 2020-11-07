@@ -23,15 +23,18 @@
 {% endfor %}
 <p>--------------------------------------</p>
 <h3>Costs:</h3>
+<a href="{% url 'cost_new' %}"> Dodaj nowy wydatek </a>
 {% for cost in user_costs %}
  <p>{{ cost.cost_id.payer_id.user.username }}</p>
  <p>{{ cost.cost_id.amount }}</p>
  <p>{{ cost.cost_id.title }}</p>
-<a href="{% url 'cost_new' %}"> Dodaj nowy wydatek </a>
+<p> <a href="{% url 'cost_edit' cost.id %}">Edytuj wydatek </a></p>
+<p> <a href="{% url 'cost_delete' cost.id %}">Usuń wydatek </a></p>
  <p>--------------------------------------</p>
 {% endfor %}
 {% if group.admin_id == request.user.profile %}
-    <h2>Usuń grupę</h2>
+<p> <a href="{% url 'group_delete' group.id %}">Usuń grupę </a></p>
+
 {% endif %}
 </body>
 </html>

@@ -10,11 +10,28 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView, TemplateView
 
-from .forms import SignUpForm
+from .forms import SignUpForm, UsersCostForm
 from .models import Profile, Group, GroupUser, Cost, CostUser, Payment
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.contrib import messages
+
+
+def LoginRequest(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+        print(form)
+
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return HttpResponseRedirect("/groups")
+    else:
+        form = AuthenticationForm()
+    return render(request, 'home.html', {'form': form})
 
 
 def signup(request):
@@ -26,70 +43,14 @@ def signup(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-            return redirect('home')
+            return HttpResponseRedirect('/groups')
     else:
         form = SignUpForm()
-    return render(request, 'signup.html', {'form': form})
+    return render(request, 'home.html', {'form': form})
 
 
-class Login(LoginView):
-    template_name = 'login.html'
-    success_url = reverse_lazy('home')
-
-
-class SignUpView(CreateView):
-    form_class = SignUpForm
-    success_url = reverse_lazy('login')
-    template_name = 'signup.html'
-
-
-class TemplateView(LogoutView):
+class LogoutView(LogoutView):
     template_name = 'home.html'
-
-
-class CostCreateView(LoginRequiredMixin, CreateView):
-    model = Cost
-    template_name = 'cost_new.html'
-    #form_class = UsersCostForm
-    success_url = reverse_lazy('home')
-
-
-    def get_form_kwargs(self):
-        """ Passes the request object to the form class.
-         This is necessary to only display members that belong to a given user"""
-
-        kwargs = super(CostCreateView, self).get_form_kwargs()
-        kwargs['request'] = self.request
-        return kwargs
-
-
-class CostEditView(LoginRequiredMixin, UpdateView):
-    model = Cost
-    template_name = 'cost_edit.html'
-    fields = '__all__'
-    success_url = '/cost'
-
-
-class CostDeleteView(LoginRequiredMixin, DeleteView):
-    model = Cost
-    template_name = 'cost_delete.html'
-    success_url = '/cost'
-
-
-class CostDetailView(DetailView):
-    model = Cost
-    template_name = 'cost_view.html'
-
-
-@login_required()
-def cost_view(request, cost_id):
-    context = {}
-    context["cost"] = get_object_or_404(Group, pk=cost_id)
-    context["user_costs"] = CostUser.objects.filter(user_id=request.user.profile, cost_id_=cost_id)
-    context["balance"] = GroupUser.objects.get(user_id=request.user.profile, cost_id=cost_id)
-    template = "cost_view.html"
-
-    return render(request, template_name=template, context=context)
 
 
 class GroupListView(LoginRequiredMixin, ListView):
@@ -160,19 +121,42 @@ def accept_or_decline_invitation(request, url):
     return render(request, template_name=template, context=context)
 
 
-def LoginRequest(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(data=request.POST)
-        print(form)
+class GroupDeleteView(LoginRequiredMixin, DeleteView):
+    model = Cost
+    template_name = 'group_delete.html'
+    success_url = '/groups'
 
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return HttpResponseRedirect("/groups")
-    else:
-        form = AuthenticationForm()
-    return render(request, 'home.html', {'form': form})
+
+class CostCreateView(LoginRequiredMixin, CreateView):
+    model = Cost
+    template_name = 'cost_new.html'
+    form_class = UsersCostForm
+    success_url = '/cost'
+
+    def form_valid(self, form):
+        form.instance.admin_id = self.request.user.profile
+        form.instance.save()
+        CostUser(user_id=self.request.user.profile, group_id=form.instance).save()
+        return super().form_valid(form)
+
+    def get_form_kwargs(self):
+        kwargs = super(CostCreateView, self).get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
+
+class CostEditView(LoginRequiredMixin, UpdateView):
+    model = Cost
+    template_name = 'cost_edit.html'
+    fields = '__all__'
+    success_url = '/cost'
+
+
+class CostDeleteView(LoginRequiredMixin, DeleteView):
+    model = Cost
+    template_name = 'cost_delete.html'
+    success_url = '/cost'
+
+
+
 

@@ -1,0 +1,9 @@
+{% block content %}
+
+    <h2> Delete Post</h2>
+        <form action="" method="post">{% csrf_token %}
+            <p>Are you sure to delete? "{{group.name}}"</p>
+            <input type="submit" value="Delete" />
+        </form>
+<p> <a href="{% url 'group_list' %}">Powrót do twoich grup </a></p>
+{% endblock %}
