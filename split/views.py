@@ -134,6 +134,8 @@ class CostCreateView(LoginRequiredMixin, CreateView):
     success_url = '/cost'
 
     def form_valid(self, form):
+        group = Group.objects.get(id=self.kwargs["pk"])
+        form.instance.group_id = group
         form.instance.admin_id = self.request.user.profile
         form.instance.save()
         CostUser(user_id=self.request.user.profile, group_id=form.instance).save()

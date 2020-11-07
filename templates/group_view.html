@@ -23,7 +23,7 @@
 {% endfor %}
 <p>--------------------------------------</p>
 <h3>Costs:</h3>
-<a href="{% url 'cost_new' %}"> Dodaj nowy wydatek </a>
+<a href="{% url 'cost_new' group.id %}"> Dodaj nowy wydatek </a>
 {% for cost in user_costs %}
  <p>{{ cost.cost_id.payer_id.user.username }}</p>
  <p>{{ cost.cost_id.amount }}</p>

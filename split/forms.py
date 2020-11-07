@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator
 
-from .models import Cost, GroupUser, Profile
+from .models import Cost, GroupUser, Profile, Group
 
 
 class SignUpForm(UserCreationForm):
@@ -20,13 +20,13 @@ class UsersCostForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         """ Grants access to the request object so that only members of the current user
         are given as options"""
-
+        group = Group.objects.get(id=self.kwargs["group_id"])
         self.request = kwargs.pop('request')
         super(UsersCostForm, self).__init__(*args, **kwargs)
-        self.fields['payer_id'].queryset = Profile.objects.filter(
+        self.fields['users'].queryset = Profile.objects.filter(
             user=self.request.user)
 
     class Meta:
         model = Cost
-        fields = ('title', 'amount', 'payer_id')
-        users = forms.ModelMultipleChoiceField(queryset=GroupUser.objects.all(), widget=forms.CheckboxSelectMultiple)
+        fields = ('title', 'amount', 'users')
+        users = forms.ModelMultipleChoiceField(queryset=GroupUser.objects.filter(group_id=group), widget=forms.CheckboxSelectMultiple)
