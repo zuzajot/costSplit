@@ -176,3 +176,55 @@ def LoginRequest(request):
         form = AuthenticationForm()
     return render(request, 'home.html', {'form': form})
 
+
+class MakePaymentView(LoginRequiredMixin, CreateView):
+    model = Payment
+    template_name = "make_payment.html"
+    fields = ["amount"]
+    success_url = "/groups"
+
+    def form_valid(self, form):
+        current_user = self.request.user.profile
+        group = Group.objects.get(id=self.kwargs["group_id"])
+        current_user_group = GroupUser.objects.get(user_id=current_user, group_id=group)
+
+        if current_user_group.balance < form.instance.amount:
+            messages.error(self.request, "Za dużo przelewasz!")
+            return redirect("group_list")
+
+        distribute_money(form.instance.amount, group)
+
+        form.instance.group_id = group
+        form.instance.user_id = current_user
+        current_user_group.balance -= form.instance.amount
+        current_user_group.save()
+        return super().form_valid(form)
+
+
+def distribute_money(amount, group):
+    for user in rates_of_distribution(group):
+        user[0].balance = round(user[0].balance+(amount*user[1]), 2)
+        user[0].save()
+
+
+def rates_of_distribution(group):
+    users = users_with_negative_balance(group)
+    sum_of_money = sum_of_money_owned(group)
+    rates = []
+    for user in users:
+        rates.append((user, (-user.balance)/sum_of_money))
+    return rates
+
+
+def sum_of_money_owned(group):
+    sum_of_money = 0
+    for user in users_with_negative_balance(group):
+        sum_of_money += (-user.balance)
+    return sum_of_money
+
+
+def users_with_negative_balance(group):
+    return GroupUser.objects.filter(group_id=group, balance__lt=0)
+
+
+#<QuerySet [<GroupUser: Bułgaria 2020 - marek - 0.0>]>
