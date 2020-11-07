@@ -1,37 +1,92 @@
 {% extends 'base.html' %}
 
-{% block title %} Grupa - szczegóły {% endblock %}
+{% block title %} Cost Split twoje grupy {% endblock %}
 
 {% block content %}
-<h1>{{ group.name }}</h1>
-<h2>Balance: {{ balance.balance }}</h2>
-<h2>{{ request.META.HTTP_HOST }}/inv/{{ group.invite_url }}</h2>
-
-<h2>Członkowie:</h2>
-<ul>
-    {% for user in users_in_group %}
-    <li>{{ user.user_id.user.username }}</li>
-    {% endfor %}
-</ul>
-
-<h3>Payments:</h3>
-{% for payment in payments %}
-<p>{{ payment.user_id.user.username }}</p>
-<p>{{ payment.amount }}</p>
+{% if messages %}
+{% for message in messages %}
+<p>{{ message }}</p>
 {% endfor %}
-<p>--------------------------------------</p>
-<h3>Costs:</h3>
-<a href="{% url 'cost_new' group.id %}"> Dodaj nowy wydatek </a>
-{% for cost in user_costs %}
-<p>{{ cost.cost_id.payer_id.user.username }}</p>
-<p>{{ cost.cost_id.amount }}</p>
-<p>{{ cost.cost_id.title }}</p>
-<p><a href="{% url 'cost_edit' cost.id %}">Edytuj wydatek </a></p>
-<p><a href="{% url 'cost_delete' cost.id %}">Usuń wydatek </a></p>
-<p>--------------------------------------</p>
-{% endfor %}
-{% if group.admin_id == request.user.profile %}
-<p><a href="{% url 'group_delete' group.id %}">Usuń grupę </a></p>
-
 {% endif %}
+
+<div class="title-group-name">{{ group.name }}</div>
+
+
+{# usun grupe #}
+        {% if group.admin_id == request.user.profile %}
+        <details>
+            <summary><b>usunąć grupe?</b></summary>
+            <a href="">usuń teraz</a>
+        </details>
+        {% endif %}
+
+
+{# członkowie #}
+        <details>
+          <summary><b>członkowie</b></summary>
+         <ul>
+            {% for user in users_in_group %}
+            <li>{{ user.user_id.user.username }}</li>
+            {% endfor %}
+        </ul>
+        </details>
+        <!--
+        <b>członkowie:</b> {% for user in users_in_group %}{{ user.user_id.user.username }}, {% endfor %}
+        -->
+
+{# link z zaproszeniem #}
+        <details>
+            <summary><b>link z zaproszniem</b></summary>
+        {{ request.META.HTTP_HOST }}/inv/{{ group.invite_url }}
+        </details>
+
+{# twój bilans/ureguluj #}
+        <div class="group-detail">
+            <span>twój bilans: {% if balance.balance > 0 %}      <span class="balance">  +{{ balance.balance }}
+        {% elif balance.balance < 0 %}    <span class="balance-"> −{{ balance.balance }}
+        {% else %}                      <span class="balance0">  jesteś kwita
+                    {% endif %}</span></span>
+        <div class="link"> - ureguluj </div>
+        </div>
+
+{# dodaj platność #}
+        <div class="group-detail">
+            <span>zapłaciłeś za coś? </span>
+        <div class="link"> + dodaj wydatek </div>
+        </div>
+
+
+{# wydatki i płatności #}
+
+        <div class="group-detail">
+            <span>spis akcji </span>
+        </div>
+
+        <table style="width: 100%; margin-top: 60px">
+
+            <tr>
+                   <td><b>co?</b></td>
+                   <td><b>ile?</b></td>
+                   <td><b>kto?</b></td>
+               </tr>
+                {% for cost in user_costs %}
+               <tr>
+                   <td>{{ cost.cost_id.title }}</td>
+                   <td><span class="balance-">{{ cost.cost_id.amount }}</span></td>
+                   <td>{{ cost.cost_id.payer_id.user.username }}</td>
+               </tr>
+
+                {% endfor %}
+
+                {% for payment in payments %}
+               <tr>
+                   <td>Spłata</td>
+                   <td><span class="balance">{{ payment.amount }}</span></td>
+                   <td>{{ payment.user_id.user.username }}</td>
+                </tr>
+                {% endfor %}
+        </table>
+
+
+
 {% endblock %}

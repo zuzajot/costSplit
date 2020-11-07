@@ -27,7 +27,7 @@ a:link, a:visited {
 .userinfo {
 }
 
-.userinfodiv, .balance-in-group, .new-group-link {
+.userinfodiv, .balance-in-group, .new-group-link, .link {
     display: flex;
     justify-content: flex-end;
     flex: 1;
@@ -40,14 +40,28 @@ a:link, a:visited {
 .balance- {
     color: #8D07F6;
 }
-.balance= {
-    color: #00FF00;
+.balance0 {
+    color: #00c500;
 }
-.group-bar {
+.group-bar, .group-detail {
     display: flex;
-        font-size: 1.5em;
-        font-weight: 700;
-        color: #D4DBF5 ;
+    font-size: 1.5em;
+    font-weight: 700;
+    color: #D4DBF5 ;
+    margin-top: -5px;
+}
+.group-detail{
+    font-size: 1.5em;
+    font-weight: 300;
+    margin-top: 70px;
+    margin-bottom: -30px;
+}
+
+.infooo {
+    font-size: 1.5em;
+    font-weight: 300;
+    margin-top: 70px;
+    margin-bottom: 30px;
 }
 
 .group-name{
@@ -55,6 +69,13 @@ a:link, a:visited {
 
 .balance-in-group {
 }
+.form-class{
+        margin: 100px auto;
+        width: 90%;
+        display: flex;
+}
+
+
 
 .balance{}
 
@@ -106,8 +127,21 @@ font-size-adjust: 40px;
     margin-bottom: 44px;
 }
 
-.new-group-link {
+.new-group-link{
     font-size: 1.5em;
     font-weight: 800;
     margin-top: 44px;
+}
+
+.link{
+    font-size: 1em;
+    font-weight: 800;
+    margin-top: 44px;
+}
+
+
+.title-group-name{
+    font-size: 2.25em;
+    font-weight: 800;
+    margin-bottom: -10px;
 }
