@@ -27,7 +27,6 @@
  <p>{{ cost.cost_id.payer_id.user.username }}</p>
  <p>{{ cost.cost_id.amount }}</p>
  <p>{{ cost.cost_id.title }}</p>
-<a href="{% url 'cost_new' %}"> Dodaj nowy wydatek </a>
  <p>--------------------------------------</p>
 {% endfor %}
 {% if group.admin_id == request.user.profile %}
