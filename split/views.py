@@ -177,10 +177,10 @@ def LoginRequest(request):
                 login(request, tutor)
                 return HttpResponseRedirect('/profile/')
             else:
-                render(request, {'form': LoginForm})
+                render(request, {'form': form})
         else:
-            render(request, {'form': LoginForm})
+            render(request, {'form': form})
     else:
         form = LoginForm()
         context = {'form': form}
-        return render(request, {'form': LoginForm})
+        return render(request, {'form': form})
