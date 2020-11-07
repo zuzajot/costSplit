@@ -10,16 +10,15 @@
 
             <div class="groupmain"><a href="{% url 'group_list' %}">Twoje grupy</a></div>
     {% else %}
-          <p>You are not logged in</p>
-          <a href="{% url 'login' %}">Log In</a>
- <form action="" method="POST">
+          <p>Jesteś niezalogowany</p>
+        <form method="POST">
         {% csrf_token %}
-            {% if login_form.errors %}
-                {{ login_form.errors}}
-            {% endif %}
-             {{ login_form }}
+            {{form.as_p}}
+    <button type ="submit">Login</button>
+    </form>
+
             <p> </p>
-            <a href="{% url 'signup' %}">Sign Up</a>
+            <p>Nie posiadasz konta? <a href="{% url 'signup' %}">Zarejestruj się!</a> </p>
     {% endif %}
 
 {% endblock %}

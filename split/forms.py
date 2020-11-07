@@ -7,13 +7,6 @@ from django.core.validators import MinLengthValidator
 from .models import Cost, GroupUser, Profile
 
 
-class LoginForm(forms.Form):
-    username = forms.CharField(label=(u'Username'),widget = forms.TextInput(attrs = {'placeholder': 'Username'}))
-    password = forms.CharField(max_length=16, label=(u'Password'),
-    widget = forms.PasswordInput(attrs = {'placeholder': 'Password (min 8 chrct)'}, render_value = False),
-    validators=[MinLengthValidator(8, message = 'Password must be at least 8 characters')])
-
-
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(max_length=254, help_text='')
 
