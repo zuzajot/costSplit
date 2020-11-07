@@ -165,22 +165,15 @@ def accept_or_decline_invitation(request, url):
 
 
 def LoginRequest(request):
-    if request.user.is_authenticated():
-        return HttpResponseRedirect('/profile/')
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            tutor = authenticate(username=username, password=password)
-            if tutor is not None:
-                login(request, tutor)
-                return HttpResponseRedirect('/profile/')
-            else:
-                render(request, {'form': form})
-        else:
-            render(request, {'form': form})
+            form.save()
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=password)
+            login(request, user)
     else:
         form = LoginForm()
-        context = {'form': form}
-        return render(request, {'form': form})
+    return render(request, 'home.html', {'form': form})
+
