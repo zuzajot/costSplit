@@ -1,28 +1,16 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView, CreateView
-from .models import GroupUser, Group, Payment, Cost, CostUser
-import string
-import random
-from django.contrib import messages
-import random
-import string
-
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
+# from django.contrib.auth.forms import UserCreationForm, SignUpForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView, TemplateView
-
 from .forms import SignUpForm, UsersCostForm
-from .models import Profile, Group, GroupUser, Cost, CostUser, Payment
+from .models import Group, GroupUser, Cost, CostUser, Payment
 from django.contrib.auth import login, authenticate
-from django.shortcuts import render, redirect
 from django.contrib import messages
+import string
+import random
 
 # Create your views here.
 
@@ -93,6 +81,7 @@ def accept_or_decline_invitation(request, url):
         return redirect("group_list")
 
     return render(request, template_name=template, context=context)
+
 
 def signup(request):
     if request.method == 'POST':
