@@ -17,19 +17,17 @@ a:link, a:visited {
   text-decoration: none;
 }
 
-
 .top-bar {
     max-width: 1200px;
     margin: 50px auto;
     display: flex;
-    font-weight: 800;
+    font-weight: 700;
 }
 
 .userinfo {
-
 }
 
-.userinfodiv, .balance-in-group {
+.userinfodiv, .balance-in-group, .new-group-link {
     display: flex;
     justify-content: flex-end;
     flex: 1;
@@ -42,47 +40,46 @@ a:link, a:visited {
 .balance- {
     color: #8D07F6;
 }
-
-
+.balance= {
+    color: #00FF00;
+}
 .group-bar {
     display: flex;
         font-size: 1.5em;
-        font-weight: 800;
+        font-weight: 700;
         color: #D4DBF5 ;
-
 }
 
 .group-name{
-
 }
 
 .balance-in-group {
-
 }
-.balance{}
-input {
 
+.balance{}
+
+input {
     border: 0;
     background-color: transparent;
     color: #D4DBF5;
     font-size: 1em;
-    font-weight: 800;
+    font-weight: 700;
     border-bottom: 2px solid #D4DBF5;
     margin-left: 10px;
     width: 290px;
-
 }
+
+
 :focus{
     outline: none;
 }
-
-
 
 
 .content {
     max-width: 760px;
     margin: 90px auto;
 }
+
 
 button {
    background: none;
@@ -94,11 +91,23 @@ button {
   display: inline-block;
   font-size: 1em;
     font-family: Mukta;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0.02em
+
 
 }
 label {
-        font-weight: 800;
+        font-weight: 700;
 font-size-adjust: 40px;
+}
+
+.twoje-grupy{
+    font-size: 1.5em;
+    margin-bottom: 44px;
+}
+
+.new-group-link {
+    font-size: 1.5em;
+    font-weight: 800;
+    margin-top: 44px;
 }

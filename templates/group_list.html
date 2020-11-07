@@ -12,6 +12,8 @@
 {% endfor %}
 {% endif %}
 
+<div class="twoje-grupy"> twoje grupy </div>
+
 {% for group in groups %}
 
 <a href="{% url 'group_view' group.group_id.id %} ">
@@ -22,7 +24,7 @@
         <div class="balance-in-group">
 {% if group.balance > 0 %}      <span class="balance">+{{ group.balance }}
 {% elif group.balance < 0 %}    <span class="balance-">−{{ group.balance }}
-{% else %}                      <span class="balance">{{ group.balance }}
+{% else %}                      <span class="balance=">{{ group.balance }}
 {% endif %}
             </span>
         </div>
@@ -33,6 +35,7 @@
 
 {% endfor %}
 
-<a href="{% url 'group_create' %}"> Dodaj nową grupę </a>
-
+<div class="new-group-link">
+<a href="{% url 'group_create' %}"> + dodaj grupe </a>
+</div>
 {% endblock %}

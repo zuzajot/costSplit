@@ -22,7 +22,7 @@
 
 {% if user.profile.balance > 0 %}      <span class="balance">+{{ user.profile.balance }}
 {% elif user.profile.balance < 0 %}    <span class="balance-">−{{ user.profile.balance }}
-{% else %}                      <span class="balance">{{ user.profile.balance }}
+{% else %}                      <span class="balance=">{{ user.profile.balance }}
 {% endif %}
             </span>
 
