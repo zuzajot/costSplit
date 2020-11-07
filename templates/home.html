@@ -11,12 +11,9 @@
             <div class="groupmain"><a href="{% url 'group_list' %}">Twoje grupy</a></div>
     {% else %}
           <p>Jesteś niezalogowany</p>
-        <form action="" method="POST">
+        <form method="POST">
         {% csrf_token %}
-            {% if LoginForm.errors %}
-                {{ LoginForm.errors}}
-            {% endif %}
-             {{ LoginForm }}
+            {{form.as_p}}
     <button type ="submit">Login</button>
     </form>
 

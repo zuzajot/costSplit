@@ -2,6 +2,7 @@ import random
 import string
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import HttpResponseRedirect
@@ -10,7 +11,7 @@ from django.template import RequestContext
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView, TemplateView
 
-from .forms import SignUpForm, LoginForm
+from .forms import SignUpForm
 from .models import Profile, Group, GroupUser, Cost, CostUser, Payment
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
@@ -166,14 +167,19 @@ def accept_or_decline_invitation(request, url):
 
 def LoginRequest(request):
     if request.method == 'POST':
-        form = LoginForm(request.POST)
+        form = AuthenticationForm(data=request.POST)
+        print(form)
+
         if form.is_valid():
-            form.save()
             username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password1')
+            password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
-            login(request, user)
+            print('redirect')
+            if user is not None:
+                login(request, user)
+                print('redirect')
+                return HttpResponseRedirect("/groups")
     else:
-        form = LoginForm()
+        form = AuthenticationForm()
     return render(request, 'home.html', {'form': form})
 
