@@ -12,6 +12,12 @@
     {% else %}
           <p>You are not logged in</p>
           <a href="{% url 'login' %}">Log In</a>
+ <form action="" method="POST">
+        {% csrf_token %}
+            {% if login_form.errors %}
+                {{ login_form.errors}}
+            {% endif %}
+             {{ login_form }}
             <p> </p>
             <a href="{% url 'signup' %}">Sign Up</a>
     {% endif %}
