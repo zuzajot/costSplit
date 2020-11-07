@@ -2,14 +2,15 @@ import random
 import string
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
+from django.template import RequestContext
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView, TemplateView
 
-from .forms import SignUpForm, UsersCostForm
+from .forms import SignUpForm, LoginForm
 from .models import Profile, Group, GroupUser, Cost, CostUser, Payment
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
@@ -53,8 +54,9 @@ class TemplateView(LogoutView):
 class CostCreateView(LoginRequiredMixin, CreateView):
     model = Cost
     template_name = 'cost_new.html'
-    form_class = UsersCostForm
+    #form_class = UsersCostForm
     success_url = reverse_lazy('home')
+
 
     def get_form_kwargs(self):
         """ Passes the request object to the form class.
@@ -81,14 +83,6 @@ class CostDeleteView(LoginRequiredMixin, DeleteView):
 class CostDetailView(DetailView):
     model = Cost
     template_name = 'cost_view.html'
-
-
-class CostListView(LoginRequiredMixin, ListView):
-    template_name = 'costs_list.html'
-    context_object_name = "cost"
-
-    def get_queryset(self):
-        return CostUser.objects.filter(user_id=self.request.user.profile)
 
 
 @login_required()
@@ -168,3 +162,25 @@ def accept_or_decline_invitation(request, url):
         return redirect("group_list")
 
     return render(request, template_name=template, context=context)
+
+
+def LoginRequest(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect('/profile/')
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            tutor = authenticate(username=username, password=password)
+            if tutor is not None:
+                login(request, tutor)
+                return HttpResponseRedirect('/profile/')
+            else:
+                render(request, {'form': LoginForm})
+        else:
+            render(request, {'form': LoginForm})
+    else:
+        form = LoginForm()
+        context = {'form': form}
+        return render(request, {'form': LoginForm})
