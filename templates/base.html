@@ -17,8 +17,19 @@
     {# if request.user.is_authenticated #}
     <div class="userinfodiv">
         <span class="userinfo">Hej,
-           {#% profile.user.username %#} Imie
-             <span class="balance">{#% profile.balance %#} +XX.XX</span>
+           {{ user.username }}
+
+
+{% if user.profile.balance > 0 %}      <span class="balance">+{{ user.profile.balance }}
+{% elif user.profile.balance < 0 %}    <span class="balance-">−{{ user.profile.balance }}
+{% else %}                      <span class="balance">{{ user.profile.balance }}
+{% endif %}
+            </span>
+
+
+
+
+
          <a href="{% url 'logout' %}">wyloguj</a></span>
     </div>
     {# endif #}
