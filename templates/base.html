@@ -8,24 +8,21 @@
     <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}"/>
 </head>
 <body>
+
+{# pasek gorny #}
 <div class="top-bar">
     <a href="{% url 'home' %}">
     <img src="{% static 'img/logo.png' %}" alt ="CS logo" height="70px">
         </a>
-    <!-- "if request.user.is_authenticated" -->
-<div class="userinfodiv">
-    <span class="userinfo">Hej,
-        USERNAME
-        <span class="balance">+XX.XX</span>
-      <a href="{% url 'logout' %}">wyloguj</a></span>
-
-      <!-- #/
-      {
-      % else %}  <a href="/login">Log In</a> {%
-       endif %} -->
+    {# if request.user.is_authenticated #}
+    <div class="userinfodiv">
+        <span class="userinfo">Hej,
+           {#% profile.user.username %#} Imie
+             <span class="balance">{#% profile.balance %#} +XX.XX</span>
+         <a href="{% url 'logout' %}">wyloguj</a></span>
     </div>
+    {# endif #}
 </div>
-
 
 <div id="content" class="content">
     {% block content %}{% endblock %}
