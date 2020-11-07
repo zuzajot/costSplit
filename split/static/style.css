@@ -1,12 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Mukta&display=swap');
 
 body {
-  background-color: #0b1747;
-  margin: 50px;
+    background-color: #0b1747;
+    margin: 50px;
     font-family: Mukta;
     color: #D4DBF5;
     font-size: 1.75em;
-letter-spacing: 0.03em;
+    letter-spacing: 0.03em;
 }
 
 .top-bar {
@@ -14,7 +14,6 @@ letter-spacing: 0.03em;
     margin: 50px auto;
     display: flex;
     font-weight: 800;
-
 }
 
 .userinfo {
