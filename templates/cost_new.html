@@ -12,19 +12,19 @@ dodajemy wydatek?
 <form action="" method="post">
     {% csrf_token %}
     {{ form.as_p }}
+
+    <div class="group-detail" style="margin-top: 0px; margin-bottom: 20px"> z kim?</div>
     {% for user_from_group in group_users %}
-
-
-
-
+    <label for="option{{user_from_group.user_id.id}}">{{ user_from_group.user_id.user }}</label>
     <input type="checkbox" name="payers" id="option{{user_from_group.user_id.id}}" value={{user_from_group.user_id.id}}>
-    <label for="option{{user_from_group.user_id.id}}">{{ user_from_group.user_id.user }}</label><br/>
-
+<br/>
     {% endfor %}
-<div class="link">
-    <input type="submit" style="" value="dodaj wydatek"/></div>
 
+<div class="link">
+    <input type="submit" style="" value="+ dodaj wydatek"/></div>
 </form>
+
+
 
 <script>
 document.querySelector('[for="id_title"]').innerHTML = "co?";
