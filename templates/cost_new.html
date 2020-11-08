@@ -3,17 +3,31 @@
 {% block title %} Nowy wydatek {% endblock %}
 
 {% block content %}
-<h1> Wydatek </h1>
+
+<div class="title-group-name">{{ group.name }}</div>
+<div class="group-detail">
+dodajemy wydatek?
+ </div>
+
 <form action="" method="post">
     {% csrf_token %}
     {{ form.as_p }}
     {% for user_from_group in group_users %}
 
+
+
+
     <input type="checkbox" name="payers" id="option{{user_from_group.user_id.id}}" value={{user_from_group.user_id.id}}>
     <label for="option{{user_from_group.user_id.id}}">{{ user_from_group.user_id.user }}</label><br/>
 
     {% endfor %}
+<div class="link">
+    <input type="submit" style="" value="dodaj wydatek"/></div>
 
-    <input type="submit" value="Utwórz wydatek"/>
 </form>
+
+<script>
+document.querySelector('[for="id_title"]').innerHTML = "co?";
+document.querySelector('[for="id_amount"]').innerHTML = "za ile?";
+</script>
 {% endblock %}
