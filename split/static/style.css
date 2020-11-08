@@ -93,6 +93,17 @@ input {
     width: 290px;
 }
 
+input[type=submit] {
+        border: 0;
+    background-color: transparent;
+    color: #D4DBF5;
+    font-size: 1em;
+    font-weight: 700;
+    border-bottom: none;
+    margin-right: 0px;
+    width: auto;
+
+}
 
 :focus{
     outline: none;
@@ -121,8 +132,8 @@ button {
 
 }
 label {
-        font-weight: 700;
-font-size-adjust: 40px;
+    font-weight: 700;
+    font-size: 1.5em;
 }
 
 .twoje-grupy{
