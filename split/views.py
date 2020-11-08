@@ -162,30 +162,30 @@ class CostDeleteView(LoginRequiredMixin, DeleteView):
 
 
 class PasswordReset(PasswordResetView):
-    email_template_name = 'password_reset_form.html'
+    email_template_name = 'templates/password_reset_form.html'
     success_url = reverse_lazy('accounts/password_reset/')
 
 
 class PasswordResetDone(PasswordResetDoneView):
-    template_name = 'password_reset_done.html'
+    template_name = 'templates/password_reset_done.html'
     success_url = reverse_lazy('accounts/password_reset/done/')
 
 
 class PasswordResetConfirm(PasswordResetConfirmView):
-    template_name = 'password_reset_confirm.html'
+    template_name = 'templates/password_reset_confirm.html'
     success_url = reverse_lazy('reset/<uidb64>/<token>')
 
 
 class PasswordResetComplete(PasswordResetCompleteView):
-    template_name = 'password_reset_complete.html'
+    template_name = 'templates/password_reset_complete.html'
     success_url = reverse_lazy('reset/done/')
 
 
 class PasswordChange(PasswordChangeView):
-    template_name = 'password_change.html'
+    template_name = 'templates/password_change.html'
     success_url = reverse_lazy('accounts/password_change/')
 
 
 class PasswordChangeDone(PasswordChangeDoneView):
-    template_name = 'password_change_done.html'
+    template_name = 'templates/password_change_done.html'
     success_url = reverse_lazy('accounts/password_change/done/')
