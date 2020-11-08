@@ -57,7 +57,7 @@ class LogoutView(LogoutView):
 class CostCreateView(LoginRequiredMixin, CreateView):
     model = Cost
     template_name = 'cost_new.html'
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('group_view')
 
     def get_form_kwargs(self):
         """ Passes the request object to the form class.
@@ -109,7 +109,10 @@ class CreateGroupView(LoginRequiredMixin, CreateView):
     template_name = "create_group.html"
     model = Group
     fields = ["name"]
-    success_url = "/groups"
+    # success_url = "/groups"
+
+    def get_success_url(self):
+        return redirect(group_view, group_id=self.name)
 
     def generate_unique_url(self, length):
         urls = self.model.objects.all().values_list('invite_url', flat=True)
