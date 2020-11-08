@@ -184,7 +184,7 @@ class GroupDeleteView(LoginRequiredMixin, DeleteView):
                 return redirect("group_view", group_id=self.kwargs["pk"])
 
         messages.success(self.request, "Usunięto grupę!")
-        return group
+        return super(GroupDeleteView, self).dispatch(request, *args, **kwargs)
 
 
 class CostCreateView(LoginRequiredMixin, CreateView):
