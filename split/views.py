@@ -165,15 +165,19 @@ class CostCreateView(LoginRequiredMixin, CreateView):
 
 
 def distribute_cost_among_users(users, amount):
+    number_of_paying_users = len(users)-1
     for i in range(len(users)):
         if i == 0:
-            money = amount - (amount / len(users))
+            if len(users) > number_of_paying_users:
+                money = amount
+            else:
+                money = amount - (amount / number_of_paying_users)
             users[i].balance += money
             users[i].save()
             users[i].user_id.balance += money
             users[i].user_id.save()
         else:
-            money = amount / len(users)
+            money = amount / number_of_paying_users
             users[i].balance -= money
             users[i].save()
             users[i].user_id.balance -= money
