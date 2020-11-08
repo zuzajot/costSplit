@@ -169,30 +169,22 @@ def accept_or_decline_invitation(request, url):
 
 class GroupDeleteView(LoginRequiredMixin, DeleteView):
     model = Group
-    template_name = 'group_delete.html'
-    success_url = '/groups'
+    template_name = "group_delete.html"
+    success_url = "/groups"
 
-    def get_object(self, queryset=None):
-        group = super(GroupDeleteView, self).get_object()
-        admin = group.admin_id
-        if not admin.id == self.request.user.id:
+    def dispatch(self, request, *args, **kwargs):
+        group = self.get_object()
+        if not group.admin_id == self.request.user.profile:
             messages.error(self.request, "Chyba zabłądziłeś przyjacielu")
-            return redirect(f"/groups/{self.kwargs['pk']}/")
-            raise Http404
+            return redirect("group_view", group_id=self.kwargs["pk"])
 
         for user in GroupUser.objects.filter(group_id=self.kwargs["pk"]):
             if not user.balance == 0:
-                messages.error(self.request, "Bilans wszystkich użytkownikow musi wynosić 0!")
-                return redirect(group_view(self.request, self.kwargs["pk"]))
-                raise Http404
-        return group
+                messages.error(self.request, "Grupowy bilans wszystkich użytkownikow musi wynosić 0!")
+                return redirect("group_view", group_id=self.kwargs["pk"])
 
-    # def form_valid(self, form):
-    #     for user_balance in GroupUser.objects.values().filter(group_id=self.kwargs["pk"])["balance"]:
-    #         if not user_balance == 0:
-    #             messages.error(self.request, "Bilans wszystkich użytkownikow musi wynosić 0!")
-    #             return redirect(f"/groups/{self.kwargs['pk']}/")
-    #     return super().form_valid(form)
+        messages.success(self.request, "Usunięto grupę!")
+        return group
 
 
 class CostCreateView(LoginRequiredMixin, CreateView):
