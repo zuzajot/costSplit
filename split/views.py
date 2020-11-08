@@ -6,7 +6,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetCompleteView, PasswordResetConfirmView, \
     PasswordResetDoneView, PasswordResetView, PasswordChangeView, PasswordChangeDoneView
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView, TemplateView
@@ -168,9 +168,31 @@ def accept_or_decline_invitation(request, url):
 
 
 class GroupDeleteView(LoginRequiredMixin, DeleteView):
-    model = Cost
+    model = Group
     template_name = 'group_delete.html'
     success_url = '/groups'
+
+    def get_object(self, queryset=None):
+        group = super(GroupDeleteView, self).get_object()
+        admin = group.admin_id
+        if not admin.id == self.request.user.id:
+            messages.error(self.request, "Chyba zabłądziłeś przyjacielu")
+            return redirect(f"/groups/{self.kwargs['pk']}/")
+            raise Http404
+
+        for user in GroupUser.objects.filter(group_id=self.kwargs["pk"]):
+            if not user.balance == 0:
+                messages.error(self.request, "Bilans wszystkich użytkownikow musi wynosić 0!")
+                return redirect(group_view(self.request, self.kwargs["pk"]))
+                raise Http404
+        return group
+
+    # def form_valid(self, form):
+    #     for user_balance in GroupUser.objects.values().filter(group_id=self.kwargs["pk"])["balance"]:
+    #         if not user_balance == 0:
+    #             messages.error(self.request, "Bilans wszystkich użytkownikow musi wynosić 0!")
+    #             return redirect(f"/groups/{self.kwargs['pk']}/")
+    #     return super().form_valid(form)
 
 
 class CostCreateView(LoginRequiredMixin, CreateView):
@@ -217,7 +239,6 @@ def distribute_cost_among_users(users, amount):
     number_of_paying_users = len(users)-1
     users = list(set(users))
     for i in range(len(users)):
-        print(users[i])
         if i == 0:
             if len(users) > number_of_paying_users:
                 money = amount
@@ -227,14 +248,12 @@ def distribute_cost_among_users(users, amount):
             users[i].save()
             users[i].user_id.balance += money
             users[i].user_id.save()
-            print(users[i])
         else:
             money = round(amount/number_of_paying_users, 2)
             users[i].balance -= money
             users[i].save()
             users[i].user_id.balance -= money
             users[i].user_id.save()
-            print(users[i])
 
 
 class CostEditView(LoginRequiredMixin, UpdateView):
