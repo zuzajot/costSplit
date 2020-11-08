@@ -6,7 +6,7 @@ urlpatterns = [
     path('logout/', views.LogoutView.as_view(), name='logout'),
     path('signup/', views.signup, name='signup'),
 
-    path('cost/new/', views.CostCreateView.as_view(), name='cost_new'),
+    path('group/<group_id>/cost/new/', views.CostCreateView.as_view(), name='cost_new'),
     path('cost/<int:pk>/edit', views.CostEditView.as_view(), name='cost_edit'),
     path('cost/<int:pk>/delete', views.CostDeleteView.as_view(), name='cost_delete'),
 

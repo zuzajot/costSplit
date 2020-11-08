@@ -82,6 +82,12 @@ class CreateGroupView(LoginRequiredMixin, CreateView):
         GroupUser(user_id=self.request.user.profile, group_id=form.instance).save()
         return super().form_valid(form)
 
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     group = Group.objects.get(id=self.kwargs["group_id"])
+    #     context["users"] = GroupUser.objects.filter(group_id=group)
+    #     return context
+
 
 @login_required()
 def group_view(request, group_id):
@@ -130,19 +136,41 @@ class GroupDeleteView(LoginRequiredMixin, DeleteView):
 class CostCreateView(LoginRequiredMixin, CreateView):
     model = Cost
     template_name = 'cost_new.html'
-    form_class = UsersCostForm
-    success_url = '/cost'
+    success_url = '/groups'
+    fields = [
+        "title",
+        "amount",
+    ]
 
     def form_valid(self, form):
-        form.instance.admin_id = self.request.user.profile
+        form.instance.payer_id = self.request.user.profile
+        group = Group.objects.get(id=self.kwargs["group_id"])
+        form.instance.group_id = group
         form.instance.save()
-        CostUser(user_id=self.request.user.profile, group_id=form.instance).save()
+
+        users_involved = [GroupUser.objects.get(user_id=self.request.user.profile, group_id=group)]
+        for user_id in self.request.POST.getlist('payers'):
+            user = Profile.objects.get(id=user_id)
+            CostUser(user_id=user, cost_id=form.instance).save()
+            users_involved.append(GroupUser.objects.get(user_id=user, group_id=group))
+
+        distribute_cost_among_users(users_involved, form.instance.amount)
         return super().form_valid(form)
 
-    def get_form_kwargs(self):
-        kwargs = super(CostCreateView, self).get_form_kwargs()
-        kwargs['request'] = self.request
-        return kwargs
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        group = Group.objects.get(id=self.kwargs["group_id"])
+        context["group_users"] = GroupUser.objects.filter(group_id=group)
+        return context
+
+
+def distribute_cost_among_users(users, amount):
+    money = amount/len(users)
+    for user in users:
+        helper = user.balance
+        money += helper
+        user.balance = money
+        user.save()
 
 
 class CostEditView(LoginRequiredMixin, UpdateView):
