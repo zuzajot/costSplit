@@ -33,6 +33,9 @@ a:link, a:visited {
     flex: 1;
 }
 
+
+
+
 .balance {
     color: #FFFF05;
 }
@@ -127,14 +130,14 @@ font-size-adjust: 40px;
     margin-bottom: 44px;
 }
 
-.new-group-link{
+.new-group-link, .link{
     font-size: 1.5em;
     font-weight: 800;
     margin-top: 44px;
 }
 
 .link{
-    font-size: 1em;
+    font-size: 1.5em;
     font-weight: 800;
     margin-top: 44px;
 }
