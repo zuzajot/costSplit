@@ -10,32 +10,30 @@
 <body>
 
 {# pasek gorny #}
-<div class="top-bar">
-    <a href="{% url 'home' %}">
-    <img src="{% static 'img/logo.png' %}" alt ="CS logo" height="70px">
-        </a>
-    {# if request.user.is_authenticated #}
-    <div class="userinfodiv">
-        <span class="userinfo">Hej,
-           {{ user.username }}
+        <div class="top-bar">
+    {# logo #}
+            <a href="{% url 'home' %}">
+            <img src="{% static 'img/logo.png' %}" alt ="CS logo" height="70px">
+                </a>
+    {# info o uzytkowniku #}
+            <div class="userinfodiv">
+                <span class="userinfo">
+                {% if user.is_authenticated %}
+                    Hej,{{ user.username }}
+    {# kolorowanie balancu #}
+                        {% if user.profile.balance > 0 %}      <span class="balance">+{{ user.profile.balance }}
+                        {% elif user.profile.balance < 0 %}    <span class="balance-">−{{ user.profile.balance }}
+                        {% else %}                             <span class="balance0">{{ user.profile.balance }}
+                        {% endif %}                            </span>
+                         <a href="{% url 'logout' %}">wyloguj</a></span>
+                    {% else %} Zapraszamy
+                {% endif %}
+                </span>
+            </div>
 
+        </div>
 
-{% if user.profile.balance > 0 %}      <span class="balance">+{{ user.profile.balance }}
-{% elif user.profile.balance < 0 %}    <span class="balance-">−{{ user.profile.balance }}
-{% else %}                      <span class="balance=">{{ user.profile.balance }}
-{% endif %}
-            </span>
-
-
-
-
-
-         <a href="{% url 'logout' %}">wyloguj</a></span>
-    </div>
-    {# endif #}
-</div>
-
-<div id="content" class="content">
+        <div id="content" class="content">
     {% block content %}{% endblock %}
 </div>
 </body>

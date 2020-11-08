@@ -1,21 +1,50 @@
 {% extends 'base.html' %}
 
+
+{% block title %} Strona główna {% endblock %}
+
 {% block content %}
-  <h2>Sign up</h2>
-  <form method="post">
-    {% csrf_token %}
-    {% for field in form %}
-      <p>
-        {{ field.label_tag }}<br>
-        {{ field }}
-        {% if field.help_text %}
-          <small style="color: grey">{{ field.help_text }}</small>
-        {% endif %}
-        {% for error in field.errors %}
-          <p style="color: red">{{ error }}</p>
-        {% endfor %}
-      </p>
-    {% endfor %}
-    <button type="submit">Sign up</button>
-  </form>
+        {% if user.is_authenticated %}
+
+            <div> <p> Hi {{ user.username }}! <a href="{% url 'logout' %}">Log Out</a> </p></div>
+
+            <div class="groupmain"><a href="{% url 'group_list' %}">Twoje grupy</a></div>
+    {% else %}
+
+
+<div class="twoje-grupy"> chcesz utwozyć konto? </div>
+
+        <form method="POST">
+        {% csrf_token %}
+        <table style="width: 70%; margin-top: 40px">
+        {% for field in form %}
+                 <tr style="height: 95px">
+                     <td style="width:30%">{{ field.errors }}{{ field.label_tag }}</td>
+                     <td>{{ field }}</td>
+                     {% if field.help_text %}
+                   </tr><tr>
+                        <td colspan="3" style="font-size: 0.5em"><p class="help">{{ field.help_text|safe }}</p></td>
+                      {% endif %}
+                </tr>
+            {% endfor %}
+         </table>
+
+<div class="link">
+    <button type ="submit">zarejestruj</button></div>
+    </form>
+
+            <p> </p>
+
+            <p><a href="{% url 'home' %}">masz konto? zaloguj</a></p>
+
+
+
+<script>
+document.querySelector('[for="id_username"]').innerHTML = "nazwa";
+document.querySelector('[for="id_email"]').innerHTML = "email";
+document.querySelector('[for="id_password1"]').innerHTML = "hasło";
+document.querySelector('[for="id_password2"]').innerHTML = "hasło";
+</script>
+    {% endif %}
+
 {% endblock %}

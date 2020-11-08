@@ -11,12 +11,28 @@ dodajemy wydatek?
 
 <form action="" method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    {# form.as_table #}
 
-    <div class="group-detail" style="margin-top: 0px; margin-bottom: 20px"> z kim?</div>
+<table style="width: 60%; margin-top: 40px">
+{% for field in form %}
+         <tr style="height: 95px">
+             <td style="width:30%">{{ field.errors }}{{ field.label_tag }}</td>
+             <td>{{ field }}</td>
+             {% if field.help_text %}
+                <td><p class="help">{{ field.help_text|safe }}</p></td>
+              {% endif %}
+
+         </tr>
+{% endfor %}
+</table>
+
+    <div class="group-detail" style="margin-top: 15px; margin-bottom: -10px"> z kim?</div>
+
     {% for user_from_group in group_users %}
-    <label for="option{{user_from_group.user_id.id}}">{{ user_from_group.user_id.user }}</label>
-    <input type="checkbox" name="payers" id="option{{user_from_group.user_id.id}}" value={{user_from_group.user_id.id}}>
+    <label class="container" for="option{{user_from_group.user_id.id}}" >{{ user_from_group.user_id.user }}
+    <input type="checkbox" name="payers" id="option{{user_from_group.user_id.id}}" value={{user_from_group.user_id.id}} checked="checked">
+    <span class="checkmark"></span>
+    </label>
 <br/>
     {% endfor %}
 
@@ -30,4 +46,6 @@ dodajemy wydatek?
 document.querySelector('[for="id_title"]').innerHTML = "co?";
 document.querySelector('[for="id_amount"]').innerHTML = "za ile?";
 </script>
+
+
 {% endblock %}
