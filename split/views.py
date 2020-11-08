@@ -54,6 +54,51 @@ class LogoutView(LogoutView):
     template_name = 'home.html'
 
 
+class CostCreateView(LoginRequiredMixin, CreateView):
+    model = Cost
+    template_name = 'cost_new.html'
+    #form_class = UsersCostForm
+    success_url = reverse_lazy('home')
+
+
+    def get_form_kwargs(self):
+        """ Passes the request object to the form class.
+         This is necessary to only display members that belong to a given user"""
+
+        kwargs = super(CostCreateView, self).get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
+
+class CostEditView(LoginRequiredMixin, UpdateView):
+    model = Cost
+    template_name = 'cost_edit.html'
+    fields = '__all__'
+    success_url = '/cost'
+
+
+class CostDeleteView(LoginRequiredMixin, DeleteView):
+    model = Cost
+    template_name = 'cost_delete.html'
+    success_url = '/cost'
+
+
+class CostDetailView(DetailView):
+    model = Cost
+    template_name = 'cost_view.html'
+
+
+@login_required()
+def cost_view(request, cost_id):
+    context = {}
+    context["cost"] = get_object_or_404(Group, pk=cost_id)
+    context["user_costs"] = CostUser.objects.filter(user_id=request.user.profile, cost_id_=cost_id)
+    context["balance"] = GroupUser.objects.get(user_id=request.user.profile, cost_id=cost_id)
+    template = "cost_view.html"
+
+    return render(request, template_name=template, context=context)
+
+
 class GroupListView(LoginRequiredMixin, ListView):
     template_name = 'group_list.html'
     context_object_name = "groups"
@@ -221,3 +266,53 @@ class PasswordChange(PasswordChangeView):
 class PasswordChangeDone(PasswordChangeDoneView):
     template_name = 'templates/password_change_done.html'
     success_url = reverse_lazy('accounts/password_change/done/')
+
+
+class MakePaymentView(LoginRequiredMixin, CreateView):
+    model = Payment
+    template_name = "make_payment.html"
+    fields = ["amount"]
+    success_url = "/groups"
+
+    def form_valid(self, form):
+        current_user = self.request.user.profile
+        group = Group.objects.get(id=self.kwargs["group_id"])
+        current_user_group = GroupUser.objects.get(user_id=current_user, group_id=group)
+
+        if current_user_group.balance < form.instance.amount:
+            messages.error(self.request, "Za dużo przelewasz!")
+            return redirect("group_list")
+
+        distribute_money(form.instance.amount, group)
+
+        form.instance.group_id = group
+        form.instance.user_id = current_user
+        current_user_group.balance -= form.instance.amount
+        current_user_group.save()
+        return super().form_valid(form)
+
+
+def distribute_money(amount, group):
+    for user in rates_of_distribution(group):
+        user[0].balance = round(user[0].balance+(amount*user[1]), 2)
+        user[0].save()
+
+
+def rates_of_distribution(group):
+    users = users_with_negative_balance(group)
+    sum_of_money = sum_of_money_owned(group)
+    rates = []
+    for user in users:
+        rates.append((user, (-user.balance)/sum_of_money))
+    return rates
+
+
+def sum_of_money_owned(group):
+    sum_of_money = 0
+    for user in users_with_negative_balance(group):
+        sum_of_money += (-user.balance)
+    return sum_of_money
+
+
+def users_with_negative_balance(group):
+    return GroupUser.objects.filter(group_id=group, balance__lt=0)

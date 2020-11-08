@@ -31,8 +31,8 @@ class Group(models.Model):
 
 
 class GroupUser(models.Model):
-    group_id = models.ForeignKey("Group", on_delete=models.DO_NOTHING)
-    user_id = models.ForeignKey("Profile", on_delete=models.DO_NOTHING)
+    group_id = models.ForeignKey("Group", on_delete=models.CASCADE)
+    user_id = models.ForeignKey("Profile", on_delete=models.CASCADE)
     balance = models.FloatField(default=0.0)
 
     def __str__(self):
@@ -43,7 +43,7 @@ class Cost(models.Model):
     title = models.CharField(max_length=100)
     amount = models.FloatField()
     payer_id = models.ForeignKey("Profile", on_delete=models.DO_NOTHING)
-    group_id = models.ForeignKey("Group", on_delete=models.DO_NOTHING)
+    group_id = models.ForeignKey("Group", on_delete=models.CASCADE)
     users = models.ManyToManyField("Profile", related_name="cost_users_many_to_many")
 
     def __str__(self):
@@ -51,8 +51,8 @@ class Cost(models.Model):
 
 
 class CostUser(models.Model):
-    cost_id = models.ForeignKey("Cost", on_delete=models.DO_NOTHING)
-    user_id = models.ForeignKey("Profile", on_delete=models.DO_NOTHING)
+    cost_id = models.ForeignKey("Cost", on_delete=models.CASCADE)
+    user_id = models.ForeignKey("Profile", on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.user_id} - {self.cost_id}"
@@ -60,8 +60,8 @@ class CostUser(models.Model):
 
 class Payment(models.Model):
     amount = models.FloatField()
-    group_id = models.ForeignKey("Group", on_delete=models.DO_NOTHING)
-    user_id = models.ForeignKey("Profile", on_delete=models.DO_NOTHING)
+    group_id = models.ForeignKey("Group", on_delete=models.CASCADE)
+    user_id = models.ForeignKey("Profile", on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.user_id} - {self.group_id} - {self.amount}"
