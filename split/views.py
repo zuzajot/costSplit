@@ -165,12 +165,19 @@ class CostCreateView(LoginRequiredMixin, CreateView):
 
 
 def distribute_cost_among_users(users, amount):
-    money = amount/len(users)
-    for user in users:
-        helper = user.balance
-        money += helper
-        user.balance = money
-        user.save()
+    for i in range(len(users)):
+        if i == 0:
+            money = amount - (amount / len(users))
+            users[i].balance += money
+            users[i].save()
+            users[i].user_id.balance += money
+            users[i].user_id.save()
+        else:
+            money = amount / len(users)
+            users[i].balance -= money
+            users[i].save()
+            users[i].user_id.balance -= money
+            users[i].user_id.save()
 
 
 class CostEditView(LoginRequiredMixin, UpdateView):
