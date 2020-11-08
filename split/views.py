@@ -183,6 +183,14 @@ class CostCreateView(LoginRequiredMixin, CreateView):
     ]
 
     def form_valid(self, form):
+        if form.instance.amount <= 0:
+            messages.error(self.request, "Nie możesz dodać ujemnego wydatku!")
+            return redirect("group_list")
+
+        elif len(self.request.POST.getlist('payers')) < 2:
+            messages.error(self.request, "Dodaj więcej płacących!")
+            return redirect("group_list")
+
         form.instance.payer_id = self.request.user.profile
         group = Group.objects.get(id=self.kwargs["group_id"])
         form.instance.group_id = group
