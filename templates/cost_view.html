@@ -8,7 +8,7 @@
         <p>Kwota: {{cost.amount}}</p>
         <p>Płacący: {{ cost.payer_id }}</p>
         <p>Grupa: {{ cost.group_id }}</p>
-        <p>Uczestnicy kosztu: {{cost.users}} </p>
+        <p>Uczestnicy kosztu: {{costuser.user.username}} </p>
         <p> <a href="{% url 'cost_edit' cost.id %}">Edytuj wydatek </a></p>
         <p> <a href="{% url 'cost_delete' cost.id %}">Usuń wydatek </a></p>
     </div>
