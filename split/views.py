@@ -4,7 +4,8 @@ import string
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordResetCompleteView, PasswordResetConfirmView, \
+    PasswordResetDoneView, PasswordResetView, PasswordChangeView, PasswordChangeDoneView
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -160,5 +161,31 @@ class CostDeleteView(LoginRequiredMixin, DeleteView):
     success_url = '/cost'
 
 
+class PasswordReset(PasswordResetView):
+    email_template_name = 'password_reset_form.html'
+    success_url = reverse_lazy('accounts/password_reset/')
 
 
+class PasswordResetDone(PasswordResetDoneView):
+    template_name = 'password_reset_done.html'
+    success_url = reverse_lazy('accounts/password_reset/done/')
+
+
+class PasswordResetConfirm(PasswordResetConfirmView):
+    template_name = 'password_reset_confirm.html'
+    success_url = reverse_lazy('reset/<uidb64>/<token>')
+
+
+class PasswordResetComplete(PasswordResetCompleteView):
+    template_name = 'password_reset_complete.html'
+    success_url = reverse_lazy('reset/done/')
+
+
+class PasswordChange(PasswordChangeView):
+    template_name = 'password_change.html'
+    success_url = reverse_lazy('accounts/password_change/')
+
+
+class PasswordChangeDone(PasswordChangeDoneView):
+    template_name = 'password_change_done.html'
+    success_url = reverse_lazy('accounts/password_change/done/')
