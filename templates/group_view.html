@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>group view test</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %} Grupa - szczegóły {% endblock %}
+
+{% block content %}
 <h1>{{ group.name }}</h1>
 <h2>Balance: {{ balance.balance }}</h2>
 <h2>{{ request.META.HTTP_HOST }}/inv/{{ group.invite_url }}</h2>
@@ -18,23 +16,22 @@
 
 <h3>Payments:</h3>
 {% for payment in payments %}
- <p>{{ payment.user_id.user.username }}</p>
- <p>{{ payment.amount }}</p>
+<p>{{ payment.user_id.user.username }}</p>
+<p>{{ payment.amount }}</p>
 {% endfor %}
 <p>--------------------------------------</p>
 <h3>Costs:</h3>
 <a href="{% url 'cost_new' group.id %}"> Dodaj nowy wydatek </a>
 {% for cost in user_costs %}
- <p>{{ cost.cost_id.payer_id.user.username }}</p>
- <p>{{ cost.cost_id.amount }}</p>
- <p>{{ cost.cost_id.title }}</p>
-<p> <a href="{% url 'cost_edit' cost.id %}">Edytuj wydatek </a></p>
-<p> <a href="{% url 'cost_delete' cost.id %}">Usuń wydatek </a></p>
- <p>--------------------------------------</p>
+<p>{{ cost.cost_id.payer_id.user.username }}</p>
+<p>{{ cost.cost_id.amount }}</p>
+<p>{{ cost.cost_id.title }}</p>
+<p><a href="{% url 'cost_edit' cost.id %}">Edytuj wydatek </a></p>
+<p><a href="{% url 'cost_delete' cost.id %}">Usuń wydatek </a></p>
+<p>--------------------------------------</p>
 {% endfor %}
 {% if group.admin_id == request.user.profile %}
-<p> <a href="{% url 'group_delete' group.id %}">Usuń grupę </a></p>
+<p><a href="{% url 'group_delete' group.id %}">Usuń grupę </a></p>
 
 {% endif %}
-</body>
-</html>
+{% endblock %}

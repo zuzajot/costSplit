@@ -131,21 +131,52 @@ class GroupDeleteView(LoginRequiredMixin, DeleteView):
 class CostCreateView(LoginRequiredMixin, CreateView):
     model = Cost
     template_name = 'cost_new.html'
-    form_class = UsersCostForm
-    success_url = '/cost'
+    success_url = '/groups'
+    fields = [
+        "title",
+        "amount",
+    ]
 
     def form_valid(self, form):
-        group = Group.objects.get(id=self.kwargs["pk"])
+        form.instance.payer_id = self.request.user.profile
+        group = Group.objects.get(id=self.kwargs["group_id"])
         form.instance.group_id = group
-        form.instance.admin_id = self.request.user.profile
         form.instance.save()
-        CostUser(user_id=self.request.user.profile, group_id=form.instance).save()
+
+        users_involved = [GroupUser.objects.get(user_id=self.request.user.profile, group_id=group)]
+        for user_id in self.request.POST.getlist('payers'):
+            user = Profile.objects.get(id=user_id)
+            CostUser(user_id=user, cost_id=form.instance).save()
+            users_involved.append(GroupUser.objects.get(user_id=user, group_id=group))
+
+        distribute_cost_among_users(users_involved, form.instance.amount)
         return super().form_valid(form)
 
-    def get_form_kwargs(self):
-        kwargs = super(CostCreateView, self).get_form_kwargs()
-        kwargs['request'] = self.request
-        return kwargs
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        group = Group.objects.get(id=self.kwargs["group_id"])
+        context["group_users"] = GroupUser.objects.filter(group_id=group)
+        return context
+
+
+def distribute_cost_among_users(users, amount):
+    number_of_paying_users = len(users)-1
+    for i in range(len(users)):
+        if i == 0:
+            if len(users) > number_of_paying_users:
+                money = amount
+            else:
+                money = amount - (amount / number_of_paying_users)
+            users[i].balance += money
+            users[i].save()
+            users[i].user_id.balance += money
+            users[i].user_id.save()
+        else:
+            money = amount / number_of_paying_users
+            users[i].balance -= money
+            users[i].save()
+            users[i].user_id.balance -= money
+            users[i].user_id.save()
 
 
 class CostEditView(LoginRequiredMixin, UpdateView):
