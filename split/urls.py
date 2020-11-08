@@ -13,7 +13,7 @@ urlpatterns = [
     path('reset/<uidb64>/<token>', views.PasswordResetConfirm.as_view(), name='password_reset_confirm'),
     path('reset/done/', views.PasswordResetComplete.as_view(), name='password_reset_complete'),
 
-    path('group/<group_id>/cost/new/', views.CostCreateView.as_view(), name='cost_new'),
+    path('groups/<group_id>/cost/new/', views.CostCreateView.as_view(), name='cost_new'),
     path('cost/<int:pk>/edit', views.CostEditView.as_view(), name='cost_edit'),
     path('cost/<int:pk>/delete', views.CostDeleteView.as_view(), name='cost_delete'),
 
