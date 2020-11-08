@@ -37,8 +37,17 @@
 {# link z zaproszeniem #}
         <details>
             <summary><b>link z zaproszniem</b></summary>
-        {{ request.META.HTTP_HOST }}/inv/{{ group.invite_url }}
+                <input id="input" type="text" value="{{ request.META.HTTP_HOST }}/inv/{{ group.invite_url }}"/>
+            <div class="link">
+                <button id="copy">Copy</button></div>
+                        <script>function copy() {
+                          var copyText = document.querySelector("#input");
+                          copyText.select();
+                          document.execCommand("copy");
+                        }
+                        document.querySelector("#copy").addEventListener("click", copy);</script>
         </details>
+
 
 {# twój bilans/ureguluj #}
         <div class="group-detail">

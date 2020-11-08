@@ -47,7 +47,7 @@ def signup(request):
             return HttpResponseRedirect('/groups')
     else:
         form = SignUpForm()
-    return render(request, 'home.html', {'form': form})
+    return render(request, 'signup.html', {'form': form})
 
 
 class LogoutView(LogoutView):
