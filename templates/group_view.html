@@ -42,18 +42,24 @@
 
 {# twój bilans/ureguluj #}
         <div class="group-detail">
-            <span>twój bilans: {% if balance.balance > 0 %}      <span class="balance">  +{{ balance.balance }}
-        {% elif balance.balance < 0 %}    <span class="balance-"> −{{ balance.balance }}
-        {% else %}                      <span class="balance0">  jesteś kwita
-                    {% endif %}</span></span></div>
-        <div class="link"> - ureguluj </div>
+            <span>twój bilans:
+        {% if balance.balance > 0 %}
+                <span class="balance">  +{{ balance.balance }}
+        {% elif balance.balance < 0 %}
+                <span class="balance-"> −{{ balance.balance }}
+        {% else %}
+                <span class="balance0">  jesteś kwita
+        {% endif %}</span>
+                </span>
+        </div>
+        <a href="{% url 'make_payment' group.id %}"><div class="link"> - ureguluj </div></a>
 
 
 {# dodaj platność #}
         <div class="group-detail">
             <span>zapłaciłeś za coś? </span>
-            </div>
-        <div class="link"> + dodaj wydatek </div>
+        </div>
+        <a href="{% url 'cost_new' group.id %}"><div class="link"> + dodaj wydatek </div></a>
 
 
 

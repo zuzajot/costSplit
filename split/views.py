@@ -11,7 +11,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView, TemplateView
 
-from .forms import SignUpForm, UsersCostForm
+from .forms import SignUpForm
 from .models import Profile, Group, GroupUser, Cost, CostUser, Payment
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
@@ -207,22 +207,26 @@ class CostCreateView(LoginRequiredMixin, CreateView):
 
 def distribute_cost_among_users(users, amount):
     number_of_paying_users = len(users)-1
+    users = list(set(users))
     for i in range(len(users)):
+        print(users[i])
         if i == 0:
             if len(users) > number_of_paying_users:
                 money = amount
             else:
-                money = amount - (amount / number_of_paying_users)
+                money = amount - round(amount/number_of_paying_users, 2)
             users[i].balance += money
             users[i].save()
             users[i].user_id.balance += money
             users[i].user_id.save()
+            print(users[i])
         else:
-            money = amount / number_of_paying_users
+            money = round(amount/number_of_paying_users, 2)
             users[i].balance -= money
             users[i].save()
             users[i].user_id.balance -= money
             users[i].user_id.save()
+            print(users[i])
 
 
 class CostEditView(LoginRequiredMixin, UpdateView):
@@ -279,27 +283,33 @@ class MakePaymentView(LoginRequiredMixin, CreateView):
         group = Group.objects.get(id=self.kwargs["group_id"])
         current_user_group = GroupUser.objects.get(user_id=current_user, group_id=group)
 
-        if current_user_group.balance < form.instance.amount:
-            messages.error(self.request, "Za dużo przelewasz!")
+        if current_user_group.balance > 0 \
+                or form.instance.amount > -current_user_group.balance \
+                or form.instance.amount < 0:
+            messages.error(self.request, "Podałeś złą kwotę!")
             return redirect("group_list")
 
         distribute_money(form.instance.amount, group)
 
         form.instance.group_id = group
         form.instance.user_id = current_user
-        current_user_group.balance -= form.instance.amount
+        current_user_group.balance += form.instance.amount
         current_user_group.save()
+        current_user.balance += form.instance.amount
+        current_user.save()
         return super().form_valid(form)
 
 
 def distribute_money(amount, group):
     for user in rates_of_distribution(group):
-        user[0].balance = round(user[0].balance+(amount*user[1]), 2)
+        user[0].balance = round(user[0].balance-(amount*user[1]), 2)
         user[0].save()
+        user[0].user_id.balance = round(user[0].user_id.balance-(amount*user[1]), 2)
+        user[0].user_id.save()
 
 
 def rates_of_distribution(group):
-    users = users_with_negative_balance(group)
+    users = users_with_positive_balance(group)
     sum_of_money = sum_of_money_owned(group)
     rates = []
     for user in users:
@@ -309,10 +319,10 @@ def rates_of_distribution(group):
 
 def sum_of_money_owned(group):
     sum_of_money = 0
-    for user in users_with_negative_balance(group):
+    for user in users_with_positive_balance(group):
         sum_of_money += (-user.balance)
     return sum_of_money
 
 
-def users_with_negative_balance(group):
-    return GroupUser.objects.filter(group_id=group, balance__lt=0)
+def users_with_positive_balance(group):
+    return GroupUser.objects.filter(group_id=group, balance__gt=0)
