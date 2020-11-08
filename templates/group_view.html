@@ -64,18 +64,22 @@
 
         <table style="width: 100%; margin-top: 60px">
 
-            <tr>
+                <tr>
                    <td><b>co?</b></td>
                    <td style="width:20%"><b>ile?</b></td>
                    <td style="width:20%"><b>kto?</b></td>
+                   <td style="width:20%"><b>?   </b></td>
                </tr>
                 {% for cost in user_costs %}
-               <tr style="height:10px%">
+               <tr>
                    <td>{{ cost.cost_id.title }}</td>
                    <td><span class="balance-"><b>{{ cost.cost_id.amount }}</b></span></td>
                    <td>{{ cost.cost_id.payer_id.user.username }}</td>
-               </tr>
-
+                   <td>
+<a href="{% url 'cost_edit' cost.id %}"    style="font-size: 0.4em; ">edytuj</a><br>
+<a href="{% url 'cost_delete' cost.id %}"  style="font-size: 0.4em">usuń  </a>
+                   </td>
+                </tr>
                 {% endfor %}
 
                 {% for payment in payments %}
