@@ -156,6 +156,7 @@ class CostCreateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         group = Group.objects.get(id=self.kwargs["group_id"])
         context["group_users"] = GroupUser.objects.filter(group_id=group)
+        context["group"] = group
         return context
 
 
