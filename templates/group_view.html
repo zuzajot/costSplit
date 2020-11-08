@@ -45,19 +45,19 @@
             <span>twój bilans: {% if balance.balance > 0 %}      <span class="balance">  +{{ balance.balance }}
         {% elif balance.balance < 0 %}    <span class="balance-"> −{{ balance.balance }}
         {% else %}                      <span class="balance0">  jesteś kwita
-                    {% endif %}</span></span>
+                    {% endif %}</span></span></div>
         <div class="link"> - ureguluj </div>
-        </div>
+
 
 {# dodaj platność #}
         <div class="group-detail">
             <span>zapłaciłeś za coś? </span>
+            </div>
         <div class="link"> + dodaj wydatek </div>
-        </div>
+
 
 
 {# wydatki i płatności #}
-
         <div class="group-detail">
             <span>spis akcji </span>
         </div>
@@ -66,13 +66,13 @@
 
             <tr>
                    <td><b>co?</b></td>
-                   <td><b>ile?</b></td>
-                   <td><b>kto?</b></td>
+                   <td style="width:20%"><b>ile?</b></td>
+                   <td style="width:20%"><b>kto?</b></td>
                </tr>
                 {% for cost in user_costs %}
-               <tr>
+               <tr style="height:10px%">
                    <td>{{ cost.cost_id.title }}</td>
-                   <td><span class="balance-">{{ cost.cost_id.amount }}</span></td>
+                   <td><span class="balance-"><b>{{ cost.cost_id.amount }}</b></span></td>
                    <td>{{ cost.cost_id.payer_id.user.username }}</td>
                </tr>
 
@@ -81,7 +81,7 @@
                 {% for payment in payments %}
                <tr>
                    <td>Spłata</td>
-                   <td><span class="balance">{{ payment.amount }}</span></td>
+                   <td><span class="balance"><b>{{ payment.amount }}</b></span></td>
                    <td>{{ payment.user_id.user.username }}</td>
                 </tr>
                 {% endfor %}

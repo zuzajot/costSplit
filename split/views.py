@@ -10,7 +10,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView, TemplateView
 
-from .forms import SignUpForm
+from .forms import SignUpForm, UsersCostForm
 from .models import Profile, Group, GroupUser, Cost, CostUser, Payment
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
@@ -50,17 +50,17 @@ class TemplateView(LogoutView):
 class CostCreateView(LoginRequiredMixin, CreateView):
     model = Cost
     template_name = 'cost_new.html'
-    #form_class = UsersCostForm
+    form_class = UsersCostForm
     success_url = reverse_lazy('home')
 
 
-    def get_form_kwargs(self):
-        """ Passes the request object to the form class.
-         This is necessary to only display members that belong to a given user"""
-
-        kwargs = super(CostCreateView, self).get_form_kwargs()
-        kwargs['request'] = self.request
-        return kwargs
+    # def get_form_kwargs(self):
+    #     """ Passes the request object to the form class.
+    #      This is necessary to only display members that belong to a given user"""
+    #
+    #     kwargs = super(CostCreateView, self).get_form_kwargs()
+    #     kwargs['request'] = self.request
+    #     return kwargs
 
 
 class CostEditView(LoginRequiredMixin, UpdateView):
