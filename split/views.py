@@ -18,7 +18,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 
 
-def LoginRequest(request):
+def login_request(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
         print(form)
@@ -57,9 +57,7 @@ class LogoutView(LogoutView):
 class CostCreateView(LoginRequiredMixin, CreateView):
     model = Cost
     template_name = 'cost_new.html'
-    #form_class = UsersCostForm
     success_url = reverse_lazy('home')
-
 
     def get_form_kwargs(self):
         """ Passes the request object to the form class.
