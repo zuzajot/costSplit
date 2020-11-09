@@ -6,12 +6,12 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetCompleteView, PasswordResetConfirmView, \
     PasswordResetDoneView, PasswordResetView, PasswordChangeView, PasswordChangeDoneView
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView, TemplateView
 
-from .forms import SignUpForm
+from .forms import SignUpForm, UsersCostForm
 from .models import Profile, Group, GroupUser, Cost, CostUser, Payment
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
@@ -168,23 +168,9 @@ def accept_or_decline_invitation(request, url):
 
 
 class GroupDeleteView(LoginRequiredMixin, DeleteView):
-    model = Group
-    template_name = "group_delete.html"
-    success_url = "/groups"
-
-    def dispatch(self, request, *args, **kwargs):
-        group = self.get_object()
-        if not group.admin_id == self.request.user.profile:
-            messages.error(self.request, "Chyba zabłądziłeś przyjacielu")
-            return redirect("group_view", group_id=self.kwargs["pk"])
-
-        for user in GroupUser.objects.filter(group_id=self.kwargs["pk"]):
-            if not user.balance == 0:
-                messages.error(self.request, "Grupowy bilans wszystkich użytkownikow musi wynosić 0!")
-                return redirect("group_view", group_id=self.kwargs["pk"])
-
-        messages.success(self.request, "Usunięto grupę!")
-        return super(GroupDeleteView, self).dispatch(request, *args, **kwargs)
+    model = Cost
+    template_name = 'group_delete.html'
+    success_url = '/groups'
 
 
 class CostCreateView(LoginRequiredMixin, CreateView):
@@ -197,14 +183,6 @@ class CostCreateView(LoginRequiredMixin, CreateView):
     ]
 
     def form_valid(self, form):
-        if form.instance.amount <= 0:
-            messages.error(self.request, "Nie możesz dodać ujemnego wydatku!")
-            return redirect("group_list")
-
-        elif len(self.request.POST.getlist('payers')) < 2:
-            messages.error(self.request, "Dodaj więcej płacących!")
-            return redirect("group_list")
-
         form.instance.payer_id = self.request.user.profile
         group = Group.objects.get(id=self.kwargs["group_id"])
         form.instance.group_id = group
@@ -229,19 +207,18 @@ class CostCreateView(LoginRequiredMixin, CreateView):
 
 def distribute_cost_among_users(users, amount):
     number_of_paying_users = len(users)-1
-    users = list(set(users))
     for i in range(len(users)):
         if i == 0:
             if len(users) > number_of_paying_users:
                 money = amount
             else:
-                money = amount - round(amount/number_of_paying_users, 2)
+                money = amount - (amount / number_of_paying_users)
             users[i].balance += money
             users[i].save()
             users[i].user_id.balance += money
             users[i].user_id.save()
         else:
-            money = round(amount/number_of_paying_users, 2)
+            money = amount / number_of_paying_users
             users[i].balance -= money
             users[i].save()
             users[i].user_id.balance -= money
@@ -302,33 +279,27 @@ class MakePaymentView(LoginRequiredMixin, CreateView):
         group = Group.objects.get(id=self.kwargs["group_id"])
         current_user_group = GroupUser.objects.get(user_id=current_user, group_id=group)
 
-        if current_user_group.balance > 0 \
-                or form.instance.amount > -current_user_group.balance \
-                or form.instance.amount < 0:
-            messages.error(self.request, "Podałeś złą kwotę!")
+        if current_user_group.balance < form.instance.amount:
+            messages.error(self.request, "Za dużo przelewasz!")
             return redirect("group_list")
 
         distribute_money(form.instance.amount, group)
 
         form.instance.group_id = group
         form.instance.user_id = current_user
-        current_user_group.balance += form.instance.amount
+        current_user_group.balance -= form.instance.amount
         current_user_group.save()
-        current_user.balance += form.instance.amount
-        current_user.save()
         return super().form_valid(form)
 
 
 def distribute_money(amount, group):
     for user in rates_of_distribution(group):
-        user[0].balance = round(user[0].balance-(amount*user[1]), 2)
+        user[0].balance = round(user[0].balance+(amount*user[1]), 2)
         user[0].save()
-        user[0].user_id.balance = round(user[0].user_id.balance-(amount*user[1]), 2)
-        user[0].user_id.save()
 
 
 def rates_of_distribution(group):
-    users = users_with_positive_balance(group)
+    users = users_with_negative_balance(group)
     sum_of_money = sum_of_money_owned(group)
     rates = []
     for user in users:
@@ -338,10 +309,10 @@ def rates_of_distribution(group):
 
 def sum_of_money_owned(group):
     sum_of_money = 0
-    for user in users_with_positive_balance(group):
+    for user in users_with_negative_balance(group):
         sum_of_money += (-user.balance)
     return sum_of_money
 
 
-def users_with_positive_balance(group):
-    return GroupUser.objects.filter(group_id=group, balance__gt=0)
+def users_with_negative_balance(group):
+    return GroupUser.objects.filter(group_id=group, balance__lt=0)

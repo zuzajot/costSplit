@@ -44,6 +44,7 @@ class Cost(models.Model):
     amount = models.FloatField()
     payer_id = models.ForeignKey("Profile", on_delete=models.DO_NOTHING)
     group_id = models.ForeignKey("Group", on_delete=models.CASCADE)
+    users = models.ManyToManyField("Profile", related_name="cost_users_many_to_many")
 
     def __str__(self):
         return f"{self.title} - {self.amount} - {self.payer_id} - {self.group_id}"
