@@ -14,6 +14,7 @@ from django.views.generic import ListView, DetailView, DeleteView, UpdateView, C
 from .forms import SignUpForm
 from .models import Profile, Group, GroupUser, Cost, CostUser, Payment
 from django.contrib.auth import login, authenticate
+from django.shortcuts import render, redirect
 from django.contrib import messages
 
 
@@ -196,6 +197,7 @@ class GroupDeleteView(LoginRequiredMixin, DeleteView):
 class CostCreateView(LoginRequiredMixin, CreateView):
     model = Cost
     template_name = 'cost_new.html'
+    success_url = '/groups'
     fields = [
         "title",
         "amount",
@@ -396,9 +398,9 @@ class MakePaymentView(LoginRequiredMixin, CreateView):
 
 def distribute_money(amount, group):
     for user in rates_of_distribution(group):
-        user[0].balance = round(user[0].balance - (amount * user[1]), 2)
+        user[0].balance = round(user[0].balance-(amount*user[1]), 2)
         user[0].save()
-        user[0].user_id.balance = round(user[0].user_id.balance - (amount * user[1]), 2)
+        user[0].user_id.balance = round(user[0].user_id.balance-(amount*user[1]), 2)
         user[0].user_id.save()
 
 
