@@ -109,6 +109,13 @@ class CreateGroupView(LoginRequiredMixin, CreateView):
     model = Group
     fields = ["name"]
 
+    def form_valid(self, form):
+        form.instance.admin_id = self.request.user.profile
+        form.instance.invite_url = self.generate_unique_url(10)
+        form.instance.save()
+        GroupUser(user_id=self.request.user.profile, group_id=form.instance).save()
+        return HttpResponseRedirect(reverse("group_view", args=(form.instance.id,)))
+
     def generate_unique_url(self, length):
         urls = self.model.objects.all().values_list('invite_url', flat=True)
         while True:
@@ -116,13 +123,6 @@ class CreateGroupView(LoginRequiredMixin, CreateView):
             if invite_url in urls:
                 continue
             return invite_url
-
-    def form_valid(self, form):
-        form.instance.admin_id = self.request.user.profile
-        form.instance.invite_url = self.generate_unique_url(10)
-        form.instance.save()
-        GroupUser(user_id=self.request.user.profile, group_id=form.instance).save()
-        return HttpResponseRedirect(reverse("group_view", args=(form.instance.id,)))
 
 
 @login_required()
@@ -148,7 +148,7 @@ def accept_or_decline_invitation(request, url):
 
     if GroupUser.objects.filter(user_id=request.user.profile, group_id=group):
         messages.error(request, "Już jesteś w tej grupie!")
-        return redirect("group_list")
+        return redirect(reverse("group_view", args=(group.id,)))
 
     context = {"group": group}
     template = "aod_invitation.html"
@@ -156,9 +156,9 @@ def accept_or_decline_invitation(request, url):
     if request.POST.get("no"):
         return redirect("group_list")
     elif request.POST.get("yes"):
-        messages.success(request, "Dodano nową grupę")
+        messages.success(request, "Dodano nową grupę!")
         GroupUser(user_id=request.user.profile, group_id=group).save()
-        return redirect("group_list")
+        return redirect(reverse("group_view", args=(group.id,)))
 
     return render(request, template_name=template, context=context)
 
