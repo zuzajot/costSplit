@@ -186,7 +186,6 @@ class GroupDeleteView(LoginRequiredMixin, DeleteView):
 class CostCreateView(LoginRequiredMixin, CreateView):
     model = Cost
     template_name = 'cost_new.html'
-    success_url = '/groups'
     fields = [
         "title",
         "amount",
@@ -195,25 +194,26 @@ class CostCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         if form.instance.amount <= 0:
             messages.error(self.request, "Nie możesz dodać ujemnego wydatku!")
-            return redirect("group_list")
+            return HttpResponseRedirect(self.request.META.get('HTTP_REFERER'))
 
         elif len(self.request.POST.getlist('payers')) < 2:
             messages.error(self.request, "Dodaj więcej płacących!")
-            return redirect("group_list")
+            return HttpResponseRedirect(self.request.META.get('HTTP_REFERER'))
 
         form.instance.payer_id = self.request.user.profile
         group = Group.objects.get(id=self.kwargs["group_id"])
         form.instance.group_id = group
         form.instance.save()
 
-        users_involved = [GroupUser.objects.get(user_id=self.request.user.profile, group_id=group)]
+        creator = GroupUser.objects.get(user_id=self.request.user.profile, group_id=group)
+        users_involved = [creator]
         for user_id in self.request.POST.getlist('payers'):
             user = Profile.objects.get(id=user_id)
             CostUser(user_id=user, cost_id=form.instance).save()
             users_involved.append(GroupUser.objects.get(user_id=user, group_id=group))
+        distribute_cost_among_users(users_involved, form.instance.amount, creator)
 
-        distribute_cost_among_users(users_involved, form.instance.amount)
-        return super().form_valid(form)
+        return HttpResponseRedirect(reverse("group_view", args=(group.id,)))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -223,25 +223,25 @@ class CostCreateView(LoginRequiredMixin, CreateView):
         return context
 
 
-def distribute_cost_among_users(users, amount):
+def distribute_cost_among_users(users, amount, creator):
     number_of_paying_users = len(users)-1
     users = list(set(users))
-    for i in range(len(users)):
-        if i == 0:
+    for user in users:
+        if user is creator:
             if len(users) > number_of_paying_users:
                 money = amount
             else:
                 money = amount - round(amount/number_of_paying_users, 2)
-            users[i].balance += money
-            users[i].save()
-            users[i].user_id.balance += money
-            users[i].user_id.save()
+            user.balance += money
+            user.save()
+            user.user_id.balance += money
+            user.user_id.save()
         else:
             money = round(amount/number_of_paying_users, 2)
-            users[i].balance -= money
-            users[i].save()
-            users[i].user_id.balance -= money
-            users[i].user_id.save()
+            user.balance -= money
+            user.save()
+            user.user_id.balance -= money
+            user.user_id.save()
 
 
 class CostEditView(LoginRequiredMixin, UpdateView):
