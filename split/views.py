@@ -298,11 +298,13 @@ class MakePaymentView(LoginRequiredMixin, CreateView):
         group = Group.objects.get(id=self.kwargs["group_id"])
         current_user_group = GroupUser.objects.get(user_id=current_user, group_id=group)
 
-        if current_user_group.balance > 0 \
-                or form.instance.amount > -current_user_group.balance \
-                or form.instance.amount < 0:
+        if current_user_group.balance >= 0:
+            messages.error(self.request, "Nie możesz zapłacić, będąc na plusie!")
+            return HttpResponseRedirect(reverse("group_view", args=(group.id,)))
+
+        if form.instance.amount > -current_user_group.balance or form.instance.amount < 0:
             messages.error(self.request, "Podałeś złą kwotę!")
-            return redirect("group_list")
+            return HttpResponseRedirect(self.request.META.get('HTTP_REFERER'))
 
         distribute_money(form.instance.amount, group)
 
@@ -312,7 +314,8 @@ class MakePaymentView(LoginRequiredMixin, CreateView):
         current_user_group.save()
         current_user.balance += form.instance.amount
         current_user.save()
-        return super().form_valid(form)
+        messages.success(self.request, f"Spłacono {form.instance.amount}!")
+        return HttpResponseRedirect(reverse("group_view", args=(group.id,)))
 
 
 def distribute_money(amount, group):
