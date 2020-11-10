@@ -4,17 +4,16 @@ import string
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView, LogoutView, PasswordResetCompleteView, PasswordResetConfirmView, \
+from django.contrib.auth.views import LogoutView, PasswordResetCompleteView, PasswordResetConfirmView, \
     PasswordResetDoneView, PasswordResetView, PasswordChangeView, PasswordChangeDoneView
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView, TemplateView
+from django.urls import reverse_lazy, reverse
+from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView
 
 from .forms import SignUpForm
 from .models import Profile, Group, GroupUser, Cost, CostUser, Payment
 from django.contrib.auth import login, authenticate
-from django.shortcuts import render, redirect
 from django.contrib import messages
 
 
@@ -109,10 +108,6 @@ class CreateGroupView(LoginRequiredMixin, CreateView):
     template_name = "create_group.html"
     model = Group
     fields = ["name"]
-    # success_url = "/groups"
-
-    def get_success_url(self):
-        return redirect(group_view, group_id=self.name)
 
     def generate_unique_url(self, length):
         urls = self.model.objects.all().values_list('invite_url', flat=True)
@@ -127,7 +122,7 @@ class CreateGroupView(LoginRequiredMixin, CreateView):
         form.instance.invite_url = self.generate_unique_url(10)
         form.instance.save()
         GroupUser(user_id=self.request.user.profile, group_id=form.instance).save()
-        return super().form_valid(form)
+        return HttpResponseRedirect(reverse("group_view", args=(form.instance.id,)))
 
 
 @login_required()
