@@ -84,16 +84,25 @@ class CostDetailView(DetailView):
     model = Cost
     template_name = 'cost_view.html'
 
+    def get(self, request, **kwargs):
+        self.object = self.get_object()
+        current_user = request.user
+        context = self.get_context_data()
 
-@login_required()
-def cost_view(request, cost_id):
-    context = {}
-    context["cost"] = get_object_or_404(Group, pk=cost_id)
-    context["user_costs"] = CostUser.objects.filter(user_id=request.user.profile, cost_id_=cost_id)
-    context["balance"] = GroupUser.objects.get(user_id=request.user.profile, cost_id=cost_id)
-    template = "cost_view.html"
+        users_involved = [self.object.payer_id]
+        for cost_user in list(context["cost_users"]):
+            users_involved.append(cost_user.user_id.user)
 
-    return render(request, template_name=template, context=context)
+        if current_user not in users_involved:
+            messages.error(request, "Zabłądziłeś!")
+            return redirect("/groups")
+
+        return self.render_to_response(context)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["cost_users"] = CostUser.objects.filter(cost_id=self.object.id)
+        return context
 
 
 class GroupListView(LoginRequiredMixin, ListView):
