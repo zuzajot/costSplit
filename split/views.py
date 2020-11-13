@@ -353,3 +353,12 @@ def sum_of_money_owned(group):
 
 def users_with_positive_balance(group):
     return GroupUser.objects.filter(group_id=group, balance__gt=0)
+
+
+def costs_and_payments_view(request):
+    context = {}
+    context["costs"] = CostUser.objects.filter(user_id=request.user.profile)
+    context["payments"] = Payment.objects.filter(user_id=request.user.profile)
+    template = "user_history.html"
+
+    return render(request, template_name=template, context=context)
