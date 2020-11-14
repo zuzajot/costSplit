@@ -142,6 +142,7 @@ def group_view(request, group_id):
     context["user_costs"] = CostUser.objects.filter(user_id=request.user.profile, cost_id__group_id=group_id)
     context["balance"] = GroupUser.objects.get(user_id=request.user.profile, group_id=group_id)
     context["users_in_group"] = GroupUser.objects.filter(group_id=group_id)
+    context["current_user_in_group"] = GroupUser.objects.get(group_id=group_id, user_id=request.user.profile)
     template = "group_view.html"
 
     return render(request, template_name=template, context=context)
@@ -233,31 +234,44 @@ class CostCreateView(LoginRequiredMixin, CreateView):
 
 
 def distribute_cost_among_users(users, amount, creator):
-    number_of_paying_users = len(users)-1
+    number_of_paying_users = len(users) - 1
     users = list(set(users))
     for user in users:
         if user is creator:
             if len(users) > number_of_paying_users:
                 money = amount
             else:
-                money = amount - round(amount/number_of_paying_users, 2)
+                money = amount - round(amount / number_of_paying_users, 2)
             user.balance += money
             user.save()
             user.user_id.balance += money
             user.user_id.save()
         else:
-            money = round(amount/number_of_paying_users, 2)
+            money = round(amount / number_of_paying_users, 2)
             user.balance -= money
             user.save()
             user.user_id.balance -= money
             user.user_id.save()
 
-
-class CostEditView(LoginRequiredMixin, UpdateView):
-    model = Cost
-    template_name = 'cost_edit.html'
-    fields = '__all__'
-    success_url = '/cost'
+# class CostEditView(LoginRequiredMixin, UpdateView):
+#     model = Cost
+#     template_name = 'cost_edit.html'
+#     fields = '__all__'
+#
+#     def dispatch(self, request, *args, **kwargs):
+#         cost = self.get_object()
+#         if not cost.payer_id == self.request.user.profile:
+#             messages.error(self.request, "Chyba zabłądziłeś przyjacielu")
+#             return redirect("group_list")
+#
+#         messages.success(self.request, "Usunięto wydatek!")
+#         return super().dispatch(request, *args, **kwargs)
+#
+#     def get_success_url(self):
+#         pass
+#
+#     def form_valid(self, form):
+#         pass
 
 
 class CostDeleteView(LoginRequiredMixin, DeleteView):
@@ -269,6 +283,7 @@ class CostDeleteView(LoginRequiredMixin, DeleteView):
 
     def delete(self, request, *args, **kwargs):
         revert_users_balance(self.get_object())
+        messages.success(self.request, "Usunięto wydatek!")
         return super().delete(self, request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -277,7 +292,6 @@ class CostDeleteView(LoginRequiredMixin, DeleteView):
             messages.error(self.request, "Chyba zabłądziłeś przyjacielu")
             return redirect("group_list")
 
-        messages.success(self.request, "Usunięto wydatek!")
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -305,7 +319,7 @@ def return_to_payer(payer, amount, number_of_payers=1, involved=False):
     if payer is not involved:
         money = amount
     else:
-        money = amount - (amount/number_of_payers)
+        money = amount - (amount / number_of_payers)
     payer.balance -= money
     payer.save()
     payer.user_id.balance -= money
@@ -380,12 +394,11 @@ class MakePaymentView(LoginRequiredMixin, CreateView):
         return context
 
 
-
 def distribute_money(amount, group):
     for user in rates_of_distribution(group):
-        user[0].balance = round(user[0].balance-(amount*user[1]), 2)
+        user[0].balance = round(user[0].balance - (amount * user[1]), 2)
         user[0].save()
-        user[0].user_id.balance = round(user[0].user_id.balance-(amount*user[1]), 2)
+        user[0].user_id.balance = round(user[0].user_id.balance - (amount * user[1]), 2)
         user[0].user_id.save()
 
 
@@ -394,7 +407,7 @@ def rates_of_distribution(group):
     sum_of_money = sum_of_money_owned(group)
     rates = []
     for user in users:
-        rates.append((user, (-user.balance)/sum_of_money))
+        rates.append((user, (-user.balance) / sum_of_money))
     return rates
 
 
@@ -416,3 +429,27 @@ def costs_and_payments_view(request):
     template = "user_history.html"
 
     return render(request, template_name=template, context=context)
+
+
+class LeaveGroup(LoginRequiredMixin, DeleteView):
+    model = GroupUser
+    template_name = "leave_group.html"
+    context_object_name = "group_user"
+    success_url = "/groups"
+
+    def dispatch(self, request, *args, **kwargs):
+        group_user = self.get_object()
+        if group_user.group_id.admin_id == self.request.user.profile:
+            messages.error(self.request, "Nie możesz opuścić utworzonej przez siebie grupy!")
+            return redirect("group_view", group_id=group_user.group_id.id)
+
+        if not group_user.balance == 0:
+            messages.error(self.request, "Nie możesz opuścić grupy, nie będąc kwita!")
+            return redirect("group_view", group_id=group_user.group_id.id)
+
+        return super(LeaveGroup, self).dispatch(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, "Opuszczono grupę!")
+        return super().delete(self, request, *args, **kwargs)
+

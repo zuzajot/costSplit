@@ -107,7 +107,8 @@
                 </tr>
                 {% endfor %}
         </table>
-
-
+     <h1>
+         <a href="{% url 'leave_group' current_user_in_group.id %}"  style="font-size: 0.4em; line-height: 10px">opuść</a>
+    </h1>
 
 {% endblock %}
