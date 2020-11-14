@@ -2,7 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.LoginRequest, name='home'),
+    path('accounts/login/', views.login_request, name='home'),
+    path('', views.GroupListView.as_view(), name='home'),
     path('logout/', views.LogoutView.as_view(), name='logout'),
     path('signup/', views.signup, name='signup'),
 
@@ -14,6 +15,8 @@ urlpatterns = [
     path('reset/done/', views.PasswordResetComplete.as_view(), name='password_reset_complete'),
 
     path('groups/<group_id>/cost/new/', views.CostCreateView.as_view(), name='cost_new'),
+    path('cost/<int:pk>/', views.CostDetailView.as_view(), name='cost_view'),
+    # path('cost/<int:pk>/', views.cost_view, name='cost_view'),
     path('cost/<int:pk>/edit', views.CostEditView.as_view(), name='cost_edit'),
     path('cost/<int:pk>/delete', views.CostDeleteView.as_view(), name='cost_delete'),
 
