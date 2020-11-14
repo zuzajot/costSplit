@@ -271,6 +271,15 @@ class CostDeleteView(LoginRequiredMixin, DeleteView):
         revert_users_balance(self.get_object())
         return super().delete(self, request, *args, **kwargs)
 
+    def dispatch(self, request, *args, **kwargs):
+        cost = self.get_object()
+        if not cost.payer_id == self.request.user.profile:
+            messages.error(self.request, "Chyba zabłądziłeś przyjacielu")
+            return redirect("group_list")
+
+        messages.success(self.request, "Usunięto wydatek!")
+        return super().dispatch(request, *args, **kwargs)
+
 
 def revert_users_balance(cost):
     cost_users = CostUser.objects.filter(cost_id=cost)
