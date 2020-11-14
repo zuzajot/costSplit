@@ -80,7 +80,7 @@ class CostEditView(LoginRequiredMixin, UpdateView):
 class CostDeleteView(LoginRequiredMixin, DeleteView):
     model = Cost
     template_name = 'cost_delete.html'
-    success_url = '/cost'
+    success_url = '/groups'
 
 
 class CostDetailView(DetailView):
