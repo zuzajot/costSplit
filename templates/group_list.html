@@ -22,7 +22,7 @@
         <div class="balance-in-group">
 
 {% if group.balance > 0 %}      <span class="balance">  +{{ group.balance }}
-{% elif group.balance < 0 %}    <span class="balance-"> −{{ group.balance }}
+{% elif group.balance < 0 %}    <span class="balance-"> {{ group.balance }}
 {% else %}                      <span class="balance0">  jesteś kwita
 {% endif %}
                                 </span>
