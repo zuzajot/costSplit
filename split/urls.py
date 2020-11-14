@@ -28,4 +28,6 @@ urlpatterns = [
     path('groups/<group_id>/payment', views.MakePaymentView.as_view(), name='make_payment'),
     path('inv/<str:url>/', views.accept_or_decline_invitation, name='aod_invitation'), # aod = accept or decline
     path('groups/<int:pk>/delete', views.GroupDeleteView.as_view(), name='group_delete'),
+
+    path('groups/<int:pk>/leave/', views.LeaveGroup.as_view(), name='leave_group'),
 ]
