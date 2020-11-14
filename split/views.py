@@ -326,6 +326,12 @@ class MakePaymentView(LoginRequiredMixin, CreateView):
         messages.success(self.request, f"Spłacono {form.instance.amount}!")
         return HttpResponseRedirect(reverse("group_view", args=(group.id,)))
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_balance = GroupUser.objects.get(group_id=self.kwargs["group_id"], user_id=self.request.user.profile)
+        context["user_balance"] = user_balance
+        return context
+
 
 def distribute_money(amount, group):
     for user in rates_of_distribution(group):
@@ -353,3 +359,12 @@ def sum_of_money_owned(group):
 
 def users_with_positive_balance(group):
     return GroupUser.objects.filter(group_id=group, balance__gt=0)
+
+
+def costs_and_payments_view(request):
+    context = {}
+    context["costs"] = CostUser.objects.filter(user_id=request.user.profile)
+    context["payments"] = Payment.objects.filter(user_id=request.user.profile)
+    template = "user_history.html"
+
+    return render(request, template_name=template, context=context)
