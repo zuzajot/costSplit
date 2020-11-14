@@ -3,17 +3,20 @@
 {% block title %} {{cost.title}}{% endblock %}
 
 {% block content %}
-    <div class="Cost">
-        <h2>Wydatek: {{cost.title}}</h2>
-        <p>Kwota: {{cost.amount}}</p>
-        <p>Płacący: {{ cost.payer_id }}</p>
-        <p>Grupa: {{ cost.group_id }}</p>
-        <p>Uczestnicy kosztu:</p>
+
+        <h1>{{cost.title}}</h1>
+<b>kwota:</b> <span class="balance">{{cost.amount}}</span><br>
+<b>płacący:</b> {{ cost.payer_id }}<br>
+<b>grupa:</b> {{ cost.group_id }}<br>
+<b>uczestnicy kosztu:</b><br>
         {% for user in cost_users %}
-        <p>{{ user.user_id }}</p>
+{{ user.user_id }}<br>
         {% endfor %}
-        <p> <a href="{% url 'cost_edit' cost.id %}">Edytuj wydatek </a></p>
-        <p> <a href="{% url 'cost_delete' cost.id %}">Usuń wydatek </a></p>
-    </div>
+
+<div class="link">
+<a href="{% url 'cost_edit' cost.id %}">Edytuj wydatek </a></div>
+<div class="link">
+<a href="{% url 'cost_delete' cost.id %}">Usuń wydatek </a></div>
+
 
 {% endblock %}
