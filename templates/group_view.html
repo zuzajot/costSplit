@@ -73,6 +73,13 @@
         <div class="group-detail">
             <span>spis akcji </span>
         </div>
+<p></p>
+<form type='get' action="/cost" style ="margin:0">
+    <label for="search_box">Wyszukiwarka wydatków</label>
+    <input id="search_box" type="text" name="search_box" placeholder="Search"/>
+    <button id="search_submit" type="submit">Wyszukaj</button>
+</form>
+
 
         <table style="width: 100%; margin-top: 60px">
 
@@ -88,6 +95,7 @@
                    <td>{{ cost.cost_id.title }}</td>
                    <td><span class="balance-"><b>{{ cost.cost_id.amount }}</b></span></td>
                    <td>{{ cost.cost_id.payer_id.user.username }}</td>
+                   <td>{{ cost.cost_id.date }}</td>
                    <td>
 <!--                   </a>-->
                        {% if cost.cost_id.payer_id.user == user %}
@@ -104,6 +112,7 @@
                    <td>Spłata</td>
                    <td><span class="balance"><b>{{ payment.amount }}</b></span></td>
                    <td>{{ payment.user_id.user.username }}</td>
+                   <td>{{ payment.date }}</td>
                 </tr>
                 {% endfor %}
         </table>

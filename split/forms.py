@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator
 
-from .models import Cost, GroupUser, Profile, Group
+from .models import Cost, GroupUser, Profile, Group, Payment
 
 
 class SignUpForm(UserCreationForm):
@@ -29,3 +29,5 @@ class UsersCostForm(forms.ModelForm):
         model = Cost
         fields = ('title', 'amount', 'users')
         users = forms.ModelMultipleChoiceField(queryset=GroupUser.objects.all(), widget=forms.CheckboxSelectMultiple)
+
+
