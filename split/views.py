@@ -263,7 +263,21 @@ class CostEditView(LoginRequiredMixin, UpdateView):
 class CostDeleteView(LoginRequiredMixin, DeleteView):
     model = Cost
     template_name = 'cost_delete.html'
-    success_url = '/cost'
+    # success_url = '/cost'
+
+    def get_success_url(self):
+        return reverse('group_view', kwargs={'group_id': self.object.group_id.id})
+    
+    def delete(self, request, *args, **kwargs):
+
+        return super(CostDeleteView, self).delete(self, request, *args, **kwargs)
+
+
+def revert_users_balance(cost_id, group_id, amount):
+    users = CostUser.objects.filter(cost_id=cost_id).values_list('user_id')
+    for user in users:
+        GroupUser.objects.get(user_id=user.user_id.id, group_id=group_id).balance
+
 
 
 class PasswordReset(PasswordResetView):
