@@ -13,10 +13,14 @@
 {{ user.user_id }}<br>
         {% endfor %}
 
+
+{% if cost.payer_id.user == user %}
 <div class="link">
 <a href="{% url 'cost_edit' cost.id %}">Edytuj wydatek </a></div>
 <div class="link">
 <a href="{% url 'cost_delete' cost.id %}">Usuń wydatek </a></div>
-
+{% endif %}
 
 {% endblock %}
+
+<!--TODO:dadac tu trzeba cos-->
