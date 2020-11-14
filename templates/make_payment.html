@@ -19,38 +19,58 @@
                  </tr>
         {% endfor %}
         </table>
+{# interaktywna lista spłacanych #}
+    <table style="width: 60%;">
+                <tr>
+                     <td style="width:30%"><b>komu?</b></td>
+                     <td><b>ile?</b></td>
+                    <td><b> pozostały dług?</b></td>
+                 </tr>
+        {% for creditor in creditors %}
+              <tr>
+                     <td>{{creditor.user_id.user.username}} </td>
+                     <td><span id="{{creditor.user_id.user.id}}">{{creditor.balance}}</span></td>
+                  <td><span id="{{creditor.user_id.user.id}}zostalo">{{creditor.balance}}</span></td>
+                 </tr>
+        {% endfor %}
+      </table>
 {# wysłanie formularza #}
             <div class="link">
                 <input type="submit" value="ureguluj"/></div>
         </form>
 
-{# interaktywna lista spłacanych #}
-        komu splacasz:<br/>
-        {% for creditor in creditors %}
-          {{creditor.user_id.user.username}} dostanie:  <span id="{{creditor.user_id.user.id}}">{{creditor.balance}}</span>
-        {% endfor %}
+
 
 
 {# "Wróc" #}
           <div class="link">
               <button onclick="history.back()">wróć</button></div>
 <script>
+document.querySelector('[for="id_amount"]').innerHTML = "kwota:";
+
 var max_amount = -1 * parseFloat({{ user_balance.balance }}) ;
 var amount = document.getElementById('id_amount');
+amount.placeholder='0.00';
+amount.min = "0.01";
+amount.step= "0.01";
+amount.max = max_amount;
 amount.value = max_amount;
 
-var creditorsMap = new Map();
+var creditors = [];
 {% for creditor in creditors %}
 var _value = parseFloat({{creditor.balance}})
-creditorsMap.set("{{creditor.user_id.user.id}}", _value);
+creditors.push(["{{creditor.user_id.user.id}}","{{creditor.user_id.user.id}}zostalo", _value]);
 {% endfor %}
 
 function przelicz(){
-    for (var [key, value] of creditorsMap) {
-        var obj = document.getElementById(key);
-        obj.innerHTML = Number(Math.round(value * amount.value / max_amount + 'e+2') + 'e-2') ;
+    for (var creditor of creditors) {
+        var obj = document.getElementById(creditor[0]);
+        obj.innerHTML = Number(Math.round(creditor[2] * amount.value / max_amount + 'e+2') + 'e-2') ;
+        var obj2 = document.getElementById(creditor[1]);
+        obj2.innerHTML = Number(Math.round((creditor[2]-(creditor[2] * amount.value / max_amount ))+ 'e+2') + 'e-2');
     }
 }
-
+przelicz();
 </script>
+
 {% endblock %}
