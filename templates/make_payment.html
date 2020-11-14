@@ -42,11 +42,15 @@
 
 
 
-<button onclick="amount.value = max_amount;">wszystko</button>
+<button onclick="amount.value = round2(max_amount);">wszystko</button>
 {# "Wróc" #}
           <div class="link">
               <button onclick="history.back()">wróć</button></div>
 <script>
+
+function round2(number){
+    return Number(Math.round(number+ 'e+2') + 'e-2');
+}
 document.querySelector('[for="id_amount"]').innerHTML = "kwota:";
 var _str = "{{ user_balance.balance }}";
 var __str = _str.replace(",",".");
@@ -55,8 +59,8 @@ var amount = document.getElementById('id_amount');
 amount.placeholder='0.00';
 amount.min = "0.01";
 amount.step= "0.01";
-amount.max = max_amount;
-amount.value = Number(Math.round(max_amount+ 'e+2') + 'e-2');
+amount.max = round2(max_amount);
+amount.value = round2(max_amount);
 
 var creditors = [];
 {% for creditor in creditors %}
