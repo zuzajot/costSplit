@@ -73,7 +73,7 @@ class CostCreateView(LoginRequiredMixin, CreateView):
 class CostEditView(LoginRequiredMixin, UpdateView):
     model = Cost
     template_name = 'cost_edit.html'
-    fields = '__all__'
+    fields = ['title', 'amount', 'users']
     success_url = '/cost'
 
 
@@ -142,6 +142,13 @@ def group_view(request, group_id):
     return render(request, template_name=template, context=context)
 
 
+def get_queryset(request):
+    searching_name = request.GET.get('search_box', None)
+    results = Cost.objects.all().filter(title__icontains=searching_name)
+
+    return render(request, 'group_view.html', {'results': results})
+
+
 @login_required()
 def accept_or_decline_invitation(request, url):
     try:
@@ -203,6 +210,7 @@ class CostCreateView(LoginRequiredMixin, CreateView):
         context["group_users"] = GroupUser.objects.filter(group_id=group)
         context["group"] = group
         return context
+
 
 
 def distribute_cost_among_users(users, amount):

@@ -4,6 +4,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 # Create your models here.
+from django.utils import timezone
 
 
 class Profile(models.Model):
@@ -45,6 +46,7 @@ class Cost(models.Model):
     payer_id = models.ForeignKey("Profile", on_delete=models.DO_NOTHING)
     group_id = models.ForeignKey("Group", on_delete=models.CASCADE)
     users = models.ManyToManyField("Profile", related_name="cost_users_many_to_many")
+    date = models.DateField(default=timezone.now)
 
     def __str__(self):
         return f"{self.title} - {self.amount} - {self.payer_id} - {self.group_id}"
@@ -62,6 +64,7 @@ class Payment(models.Model):
     amount = models.FloatField()
     group_id = models.ForeignKey("Group", on_delete=models.CASCADE)
     user_id = models.ForeignKey("Profile", on_delete=models.CASCADE)
+    date = models.DateField(default=timezone.now)
 
     def __str__(self):
         return f"{self.user_id} - {self.group_id} - {self.amount}"

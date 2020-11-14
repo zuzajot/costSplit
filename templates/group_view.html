@@ -62,7 +62,7 @@
         <div class="group-detail">
             <span>zapłaciłeś za coś? </span>
             </div>
-        <div class="link"> + dodaj wydatek </div>
+        <div class="link"><a href="{% url 'cost_new' group.id %}">+ dodaj wydatek  </a> </div>
 
 
 
@@ -70,6 +70,13 @@
         <div class="group-detail">
             <span>spis akcji </span>
         </div>
+<p></p>
+<form type='get' action="/cost" style ="margin:0">
+    <label for="search_box">Wyszukiwarka wydatków</label>
+    <input id="search_box" type="text" name="search_box" placeholder="Search"/>
+    <button id="search_submit" type="submit">Wyszukaj</button>
+</form>
+
 
         <table style="width: 100%; margin-top: 60px">
 
@@ -77,6 +84,7 @@
                    <td><b>co?</b></td>
                    <td style="width:20%"><b>ile?</b></td>
                    <td style="width:20%"><b>kto?</b></td>
+                   <td style="width:20%"><b>kiedy?</b></td>
                    <td style="width:20%"><b>?   </b></td>
                </tr>
                 {% for cost in user_costs %}
@@ -84,6 +92,7 @@
                    <td>{{ cost.cost_id.title }}</td>
                    <td><span class="balance-"><b>{{ cost.cost_id.amount }}</b></span></td>
                    <td>{{ cost.cost_id.payer_id.user.username }}</td>
+                   <td>{{ cost.cost_id.date }}</td>
                    <td>
 <a href="{% url 'cost_edit' cost.id %}"    style="font-size: 0.4em; ">edytuj</a><br>
 <a href="{% url 'cost_delete' cost.id %}"  style="font-size: 0.4em">usuń  </a>
@@ -96,6 +105,7 @@
                    <td>Spłata</td>
                    <td><span class="balance"><b>{{ payment.amount }}</b></span></td>
                    <td>{{ payment.user_id.user.username }}</td>
+                   <td>{{ payment.date }}</td>
                 </tr>
                 {% endfor %}
         </table>

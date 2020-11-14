@@ -9,10 +9,9 @@
             <div> <p> Hi {{ user.username }}! <a href="{% url 'logout' %}">Log Out</a> </p></div>
 
             <div class="groupmain"><a href="{% url 'group_list' %}">Twoje grupy</a></div>
+
+
     {% else %}
-
-
-
 
         <form method="POST">
         {% csrf_token %}
