@@ -326,6 +326,12 @@ class MakePaymentView(LoginRequiredMixin, CreateView):
         messages.success(self.request, f"Spłacono {form.instance.amount}!")
         return HttpResponseRedirect(reverse("group_view", args=(group.id,)))
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_balance = GroupUser.objects.get(group_id=self.kwargs["group_id"], user_id=self.request.user.profile)
+        context["user_balance"] = user_balance
+        return context
+
 
 def distribute_money(amount, group):
     for user in rates_of_distribution(group):

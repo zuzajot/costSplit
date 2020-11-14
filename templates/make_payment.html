@@ -8,5 +8,6 @@
     {% csrf_token %}
     {{form.as_p }}
     <input type="submit" value="Save"/>
+    <p>{{ user_balance.balance }}</p>
 </form>
 {% endblock %}
