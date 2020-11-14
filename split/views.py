@@ -117,7 +117,7 @@ class GroupListView(LoginRequiredMixin, ListView):
 class CreateGroupView(LoginRequiredMixin, CreateView):
     template_name = "create_group.html"
     model = Group
-    fields = ["name"]
+    fields = ["name", 'group_currency']
 
     def form_valid(self, form):
         form.instance.admin_id = self.request.user.profile
@@ -199,6 +199,7 @@ class CostCreateView(LoginRequiredMixin, CreateView):
     fields = [
         "title",
         "amount",
+        'currency'
     ]
 
     def form_valid(self, form):
@@ -252,6 +253,9 @@ def distribute_cost_among_users(users, amount, creator):
             user.save()
             user.user_id.balance -= money
             user.user_id.save()
+
+# def currency_converter(amount, currency):
+#     amount =
 
 
 class CostEditView(LoginRequiredMixin, UpdateView):

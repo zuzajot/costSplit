@@ -13,6 +13,7 @@
         <ul><li>{{ user.user_id }}</li></ul>
         {% endfor %}
         <p>Data utworzenia: {{cost.date}}</p>
+        <p>Waluta: {{cost.currency}}</p>
         <p> <a href="{% url 'cost_edit' cost.id %}">Edytuj wydatek </a></p>
         <p> <a href="{% url 'cost_delete' cost.id %}">Usuń wydatek </a></p>
     </div>
