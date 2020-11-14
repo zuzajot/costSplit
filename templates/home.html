@@ -13,10 +13,10 @@
 
 
 
-
+<h2>logujemy?</h2>
         <form method="POST">
         {% csrf_token %}
-        <table style="width: 100%; margin-top: 40px">
+        <table style="width: 70%; margin-top: 40px">
         {% for field in form %}
                  <tr style="height: 95px">
                      <td style="width:30%">{{ field.errors }}{{ field.label_tag }}</td>
@@ -29,7 +29,7 @@
          </table>
 
 <div class="link">
-    <button type ="submit">Login</button></div>
+    <button type ="submit">zaloguj</button></div>
     </form>
 
             <p> </p>

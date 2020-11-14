@@ -22,7 +22,7 @@
                     Hej,{{ user.username }}
     {# kolorowanie balancu #}
                         {% if user.profile.balance > 0 %}      <span class="balance">+{{ user.profile.balance }}
-                        {% elif user.profile.balance < 0 %}    <span class="balance-">−{{ user.profile.balance }}
+                        {% elif user.profile.balance < 0 %}    <span class="balance-">{{ user.profile.balance }}
                         {% else %}                             <span class="balance0">{{ user.profile.balance }}
                         {% endif %}                            </span>
                          <a href="{% url 'logout' %}">wyloguj</a></span>

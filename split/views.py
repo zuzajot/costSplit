@@ -266,7 +266,7 @@ class CostDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_success_url(self):
         return reverse('group_view', kwargs={'group_id': self.object.group_id.id})
-    
+
     def delete(self, request, *args, **kwargs):
         revert_users_balance(self.get_object())
         return super().delete(self, request, *args, **kwargs)
@@ -376,7 +376,9 @@ class MakePaymentView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         user_balance = GroupUser.objects.get(group_id=self.kwargs["group_id"], user_id=self.request.user.profile)
         context["user_balance"] = user_balance
+        context["creditors"] = GroupUser.objects.filter(group_id=self.kwargs["group_id"], balance__gt=0)
         return context
+
 
 
 def distribute_money(amount, group):

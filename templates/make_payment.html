@@ -1,29 +1,56 @@
-{% extends 'base.html' %}
+        {% extends 'base.html' %}
 
-{% block title %} Nowy payment {% endblock %}
+        {% block title %} Nowy payment {% endblock %}
 
-{% block content %}
-<h1> Payment </h1>
-<form action="" method="post">
-    {% csrf_token %}
+        {% block content %}
+{# Tytuł #}
+        <h1> uregulować? </h1>
+        <form action="" method="post" oninput="przelicz()">
+            {% csrf_token %}
+{# Pola formularza #}
+        <table style="width: 60%; margin-top: 40px">
+        {% for field in form %}
+                 <tr style="height: 95px">
+                     <td style="width:30%">{{ field.errors }}{{ field.label_tag }}</td>
+                     <td>{{ field }}</td>
+                     {% if field.help_text %}
+                        <td><p class="help">{{ field.help_text|safe }}</p></td>
+                      {% endif %}
+                 </tr>
+        {% endfor %}
+        </table>
+{# wysłanie formularza #}
+            <div class="link">
+                <input type="submit" value="ureguluj"/></div>
+        </form>
 
-<table style="width: 60%; margin-top: 40px">
+{# interaktywna lista spłacanych #}
+        komu splacasz:<br/>
+        {% for creditor in creditors %}
+          {{creditor.user_id.user.username}} dostanie:  <span id="{{creditor.user_id.user.id}}">{{creditor.balance}}</span>
+        {% endfor %}
 
-{% for field in form %}
-         <tr style="height: 95px">
-             <td style="width:30%">{{ field.errors }}{{ field.label_tag }}</td>
-             <td>{{ field }}</td>
-             {% if field.help_text %}
-                <td><p class="help">{{ field.help_text|safe }}</p></td>
-              {% endif %}
 
-         </tr>
+{# "Wróc" #}
+          <div class="link">
+              <button onclick="history.back()">wróć</button></div>
+<script>
+var max_amount = -1 * parseFloat({{ user_balance.balance }}) ;
+var amount = document.getElementById('id_amount');
+amount.value = max_amount;
+
+var creditorsMap = new Map();
+{% for creditor in creditors %}
+var _value = parseFloat({{creditor.balance}})
+creditorsMap.set("{{creditor.user_id.user.id}}", _value);
 {% endfor %}
 
-</table>
+function przelicz(){
+    for (var [key, value] of creditorsMap) {
+        var obj = document.getElementById(key);
+        obj.innerHTML = Number(Math.round(value * amount.value / max_amount + 'e+2') + 'e-2') ;
+    }
+}
 
-    <div class="link">
-        <input type="submit" value="Save"/></div>
-     <p>{{ user_balance.balance }}</p>
-</form>
+</script>
 {% endblock %}
