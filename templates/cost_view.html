@@ -10,8 +10,9 @@
 <b>grupa:</b> {{ cost.group_id }}<br>
 <b>uczestnicy kosztu:</b><br>
         {% for user in cost_users %}
-{{ user.user_id }}<br>
+        <ul><li>{{ user.user_id }}</li></ul>
         {% endfor %}
+        <p>Data utworzenia: {{cost.date}}</p>
 
 
 {% if cost.payer_id.user == user %}
@@ -22,5 +23,3 @@
 {% endif %}
 
 {% endblock %}
-
-<!--TODO:dadac tu trzeba cos-->
