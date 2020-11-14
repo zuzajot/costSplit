@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %} Cost Split twoje grupy {% endblock %}
+
+{% block content %}
+
+
+
+{% if messages %}
+{% for message in messages %}
+<p>{{ message }}</p>
+{% endfor %}
+{% endif %}
+
+<div class="twoje-grupy"> Historia </div>
+
+<h2>Spłaty:</h2>
+{% for payment in payments %}
+    <p>{{ payment.group_id }}: {{ payment.amount }}</p>
+{% endfor %}
+
+<h2>Wydatki:</h2>
+{% for cost in costs %}
+    <p>{{ cost.cost_id.group_id }}: {{ cost.cost_id.amount }} - {{ cost.cost_id.title }}</p>
+{% endfor %}
+
+{% endblock %}
