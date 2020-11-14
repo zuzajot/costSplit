@@ -18,7 +18,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 
 
-def LoginRequest(request):
+def login_request(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
         print(form)
