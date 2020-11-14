@@ -102,17 +102,6 @@ select:-webkit-autofill:focus  {
     width: 100%;
 }
 
-input[type=submit] {
-        border: 0;
-    background-color: transparent;
-    color: #D4DBF5;
-    font-size: 1em;
-    font-weight: 700;
-    border-bottom: none;
-    margin-right: 0px;
-    width: auto;
-
-}
 
 input[type=submit]:hover, a:hover, button:hover {
   -webkit-transform: rotate(-10deg) !important;
@@ -148,8 +137,8 @@ button {
 
 
 label {
-    font-weight: 700;
-    font-size: 1.5em;
+        font-weight: 700;
+font-size-adjust: 40px;
 }
 
 .twoje-grupy{

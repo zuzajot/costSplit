@@ -6,7 +6,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LogoutView, PasswordResetCompleteView, PasswordResetConfirmView, \
     PasswordResetDoneView, PasswordResetView, PasswordChangeView, PasswordChangeDoneView
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView
@@ -14,6 +14,7 @@ from django.views.generic import ListView, DetailView, DeleteView, UpdateView, C
 from .forms import SignUpForm
 from .models import Profile, Group, GroupUser, Cost, CostUser, Payment
 from django.contrib.auth import login, authenticate
+from django.shortcuts import render, redirect
 from django.contrib import messages
 
 
@@ -70,7 +71,7 @@ class CostCreateView(LoginRequiredMixin, CreateView):
 class CostEditView(LoginRequiredMixin, UpdateView):
     model = Cost
     template_name = 'cost_edit.html'
-    fields = '__all__'
+    fields = ['title', 'amount', 'users']
     success_url = '/cost'
 
 
@@ -203,11 +204,11 @@ class CostCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         if form.instance.amount <= 0:
             messages.error(self.request, "Nie możesz dodać ujemnego wydatku!")
-            return HttpResponseRedirect(self.request.META.get('HTTP_REFERER'))
+            return redirect("group_list")
 
         elif len(self.request.POST.getlist('payers')) < 2:
             messages.error(self.request, "Dodaj więcej płacących!")
-            return HttpResponseRedirect(self.request.META.get('HTTP_REFERER'))
+            return redirect("group_list")
 
         form.instance.payer_id = self.request.user.profile
         group = Group.objects.get(id=self.kwargs["group_id"])
@@ -220,9 +221,9 @@ class CostCreateView(LoginRequiredMixin, CreateView):
             user = Profile.objects.get(id=user_id)
             CostUser(user_id=user, cost_id=form.instance).save()
             users_involved.append(GroupUser.objects.get(user_id=user, group_id=group))
-        distribute_cost_among_users(users_involved, form.instance.amount, creator)
 
-        return HttpResponseRedirect(reverse("group_view", args=(group.id,)))
+        distribute_cost_among_users(users_involved, form.instance.amount)
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
