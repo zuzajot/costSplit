@@ -10,8 +10,9 @@
         <p>Grupa: {{ cost.group_id }}</p>
         <p>Uczestnicy kosztu:</p>
         {% for user in cost_users %}
-        <p>{{ user.user_id }}</p>
+        <ul><li>{{ user.user_id }}</li></ul>
         {% endfor %}
+        <p>Data utworzenia: {{cost.date}}</p>
         <p> <a href="{% url 'cost_edit' cost.id %}">Edytuj wydatek </a></p>
         <p> <a href="{% url 'cost_delete' cost.id %}">Usuń wydatek </a></p>
     </div>
