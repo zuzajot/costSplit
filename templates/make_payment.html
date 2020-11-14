@@ -13,6 +13,7 @@
                  <tr style="height: 95px">
                      <td style="width:30%">{{ field.errors }}{{ field.label_tag }}</td>
                      <td>{{ field }}</td>
+                     <td> </td>
                      {% if field.help_text %}
                         <td><p class="help">{{ field.help_text|safe }}</p></td>
                       {% endif %}
@@ -20,11 +21,11 @@
         {% endfor %}
         </table>
 {# interaktywna lista spłacanych #}
-    <table style="width: 60%;">
+    <table style="width: 100%;">
                 <tr>
                      <td style="width:30%"><b>komu?</b></td>
-                     <td><b>ile?</b></td>
-                    <td><b> pozostały dług?</b></td>
+                     <td style="width:30%"><b>ile?</b></td>
+                    <td><b>ile będziesz dłużny?</b></td>
                  </tr>
         {% for creditor in creditors %}
               <tr>
@@ -41,20 +42,21 @@
 
 
 
-
+<button onclick="amount.value = max_amount;">wszystko</button>
 {# "Wróc" #}
           <div class="link">
               <button onclick="history.back()">wróć</button></div>
 <script>
 document.querySelector('[for="id_amount"]').innerHTML = "kwota:";
-
-var max_amount = -1 * parseFloat({{ user_balance.balance }}) ;
+var _str = "{{ user_balance.balance }}";
+var __str = _str.replace(",",".");
+var max_amount = -1 * parseFloat(__str) ;
 var amount = document.getElementById('id_amount');
 amount.placeholder='0.00';
 amount.min = "0.01";
 amount.step= "0.01";
 amount.max = max_amount;
-amount.value = max_amount;
+amount.value = Number(Math.round(max_amount+ 'e+2') + 'e-2');
 
 var creditors = [];
 {% for creditor in creditors %}
