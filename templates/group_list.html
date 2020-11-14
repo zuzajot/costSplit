@@ -22,7 +22,7 @@
         <div class="balance-in-group">
 
 {% if group.balance > 0 %}      <span class="balance">  +{{ group.balance }}
-{% elif group.balance < 0 %}    <span class="balance-"> −{{ group.balance }}
+{% elif group.balance < 0 %}    <span class="balance-"> {{ group.balance }}
 {% else %}                      <span class="balance0">  jesteś kwita
 {% endif %}
                                 </span>
@@ -37,4 +37,6 @@
 <div class="new-group-link">
 <a href="{% url 'group_create' %}"> + dodaj grupe </a>
 </div>
+
+<a href="{% url 'user_history' %}"> Historia wydatków i spłat </a>
 {% endblock %}

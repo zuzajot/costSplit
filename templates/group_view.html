@@ -16,7 +16,7 @@
         {% if group.admin_id == request.user.profile %}
         <details>
             <summary><b>usunąć grupe?</b></summary>
-            <a href="">usuń teraz</a>
+            <a href="{% url 'group_delete' group.id %}">usuń teraz</a>
         </details>
         {% endif %}
 
@@ -52,10 +52,13 @@
 {# twój bilans/ureguluj #}
         <div class="group-detail">
             <span>twój bilans: {% if balance.balance > 0 %}      <span class="balance">  +{{ balance.balance }}
-        {% elif balance.balance < 0 %}    <span class="balance-"> −{{ balance.balance }}
+        {% elif balance.balance < 0 %}    <span class="balance-"> {{ balance.balance }}
         {% else %}                      <span class="balance0">  jesteś kwita
                     {% endif %}</span></span></div>
-        <div class="link"> - ureguluj </div>
+
+        {% if balance.balance < 0 %}
+        <div class="link"> <a href="{% url 'make_payment' group.id %}"> − ureguluj</a> </div>
+        {% endif %}
 
 
 {# dodaj platność #}

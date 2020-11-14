@@ -4,14 +4,14 @@ import string
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView, LogoutView, PasswordResetCompleteView, PasswordResetConfirmView, \
+from django.contrib.auth.views import LogoutView, PasswordResetCompleteView, PasswordResetConfirmView, \
     PasswordResetDoneView, PasswordResetView, PasswordChangeView, PasswordChangeDoneView
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView, TemplateView
+from django.urls import reverse_lazy, reverse
+from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView
 
-from .forms import SignUpForm, UsersCostForm
+from .forms import SignUpForm
 from .models import Profile, Group, GroupUser, Cost, CostUser, Payment
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
@@ -57,9 +57,7 @@ class LogoutView(LogoutView):
 class CostCreateView(LoginRequiredMixin, CreateView):
     model = Cost
     template_name = 'cost_new.html'
-    #form_class = UsersCostForm
-    success_url = reverse_lazy('home')
-
+    success_url = reverse_lazy('group_view')
 
     def get_form_kwargs(self):
         """ Passes the request object to the form class.
@@ -80,23 +78,32 @@ class CostEditView(LoginRequiredMixin, UpdateView):
 class CostDeleteView(LoginRequiredMixin, DeleteView):
     model = Cost
     template_name = 'cost_delete.html'
-    success_url = '/groups'
+    success_url = '/cost'
 
 
 class CostDetailView(DetailView):
     model = Cost
     template_name = 'cost_view.html'
 
+    def get(self, request, **kwargs):
+        self.object = self.get_object()
+        current_user = request.user
+        context = self.get_context_data()
 
-@login_required()
-def cost_view(request, cost_id):
-    context = {}
-    context["cost"] = get_object_or_404(Group, pk=cost_id)
-    context["user_costs"] = CostUser.objects.filter(user_id=request.user.profile, cost_id_=cost_id)
-    context["balance"] = GroupUser.objects.get(user_id=request.user.profile, cost_id=cost_id)
-    template = "cost_view.html"
+        users_involved = [self.object.payer_id]
+        for cost_user in list(context["cost_users"]):
+            users_involved.append(cost_user.user_id.user)
 
-    return render(request, template_name=template, context=context)
+        if current_user not in users_involved:
+            messages.error(request, "Zabłądziłeś!")
+            return redirect("/groups")
+
+        return self.render_to_response(context)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["cost_users"] = CostUser.objects.filter(cost_id=self.object.id)
+        return context
 
 
 class GroupListView(LoginRequiredMixin, ListView):
@@ -111,7 +118,13 @@ class CreateGroupView(LoginRequiredMixin, CreateView):
     template_name = "create_group.html"
     model = Group
     fields = ["name"]
-    success_url = "/groups"
+
+    def form_valid(self, form):
+        form.instance.admin_id = self.request.user.profile
+        form.instance.invite_url = self.generate_unique_url(10)
+        form.instance.save()
+        GroupUser(user_id=self.request.user.profile, group_id=form.instance).save()
+        return HttpResponseRedirect(reverse("group_view", args=(form.instance.id,)))
 
     def generate_unique_url(self, length):
         urls = self.model.objects.all().values_list('invite_url', flat=True)
@@ -120,13 +133,6 @@ class CreateGroupView(LoginRequiredMixin, CreateView):
             if invite_url in urls:
                 continue
             return invite_url
-
-    def form_valid(self, form):
-        form.instance.admin_id = self.request.user.profile
-        form.instance.invite_url = self.generate_unique_url(10)
-        form.instance.save()
-        GroupUser(user_id=self.request.user.profile, group_id=form.instance).save()
-        return super().form_valid(form)
 
 
 @login_required()
@@ -142,13 +148,6 @@ def group_view(request, group_id):
     return render(request, template_name=template, context=context)
 
 
-def get_queryset(request):
-    searching_name = request.GET.get('search_box', None)
-    results = Cost.objects.all().filter(title__icontains=searching_name)
-
-    return render(request, 'group_view.html', {'results': results})
-
-
 @login_required()
 def accept_or_decline_invitation(request, url):
     try:
@@ -159,7 +158,7 @@ def accept_or_decline_invitation(request, url):
 
     if GroupUser.objects.filter(user_id=request.user.profile, group_id=group):
         messages.error(request, "Już jesteś w tej grupie!")
-        return redirect("group_list")
+        return redirect(reverse("group_view", args=(group.id,)))
 
     context = {"group": group}
     template = "aod_invitation.html"
@@ -167,35 +166,57 @@ def accept_or_decline_invitation(request, url):
     if request.POST.get("no"):
         return redirect("group_list")
     elif request.POST.get("yes"):
-        messages.success(request, "Dodano nową grupę")
+        messages.success(request, "Dodano nową grupę!")
         GroupUser(user_id=request.user.profile, group_id=group).save()
-        return redirect("group_list")
+        return redirect(reverse("group_view", args=(group.id,)))
 
     return render(request, template_name=template, context=context)
 
 
 class GroupDeleteView(LoginRequiredMixin, DeleteView):
-    model = Cost
-    template_name = 'group_delete.html'
-    success_url = '/groups'
+    model = Group
+    template_name = "group_delete.html"
+    success_url = "/groups"
+
+    def dispatch(self, request, *args, **kwargs):
+        group = self.get_object()
+        if not group.admin_id == self.request.user.profile:
+            messages.error(self.request, "Chyba zabłądziłeś przyjacielu")
+            return redirect("group_view", group_id=self.kwargs["pk"])
+
+        for user in GroupUser.objects.filter(group_id=self.kwargs["pk"]):
+            if not user.balance == 0:
+                messages.error(self.request, "Grupowy bilans wszystkich użytkownikow musi wynosić 0!")
+                return redirect("group_view", group_id=self.kwargs["pk"])
+
+        messages.success(self.request, "Usunięto grupę!")
+        return super(GroupDeleteView, self).dispatch(request, *args, **kwargs)
 
 
 class CostCreateView(LoginRequiredMixin, CreateView):
     model = Cost
     template_name = 'cost_new.html'
-    success_url = '/groups'
     fields = [
         "title",
         "amount",
     ]
 
     def form_valid(self, form):
+        if form.instance.amount <= 0:
+            messages.error(self.request, "Nie możesz dodać ujemnego wydatku!")
+            return redirect("group_list")
+
+        elif len(self.request.POST.getlist('payers')) < 2:
+            messages.error(self.request, "Dodaj więcej płacących!")
+            return redirect("group_list")
+
         form.instance.payer_id = self.request.user.profile
         group = Group.objects.get(id=self.kwargs["group_id"])
         form.instance.group_id = group
         form.instance.save()
 
-        users_involved = [GroupUser.objects.get(user_id=self.request.user.profile, group_id=group)]
+        creator = GroupUser.objects.get(user_id=self.request.user.profile, group_id=group)
+        users_involved = [creator]
         for user_id in self.request.POST.getlist('payers'):
             user = Profile.objects.get(id=user_id)
             CostUser(user_id=user, cost_id=form.instance).save()
@@ -212,25 +233,25 @@ class CostCreateView(LoginRequiredMixin, CreateView):
         return context
 
 
-
-def distribute_cost_among_users(users, amount):
+def distribute_cost_among_users(users, amount, creator):
     number_of_paying_users = len(users)-1
-    for i in range(len(users)):
-        if i == 0:
+    users = list(set(users))
+    for user in users:
+        if user is creator:
             if len(users) > number_of_paying_users:
                 money = amount
             else:
-                money = amount - (amount / number_of_paying_users)
-            users[i].balance += money
-            users[i].save()
-            users[i].user_id.balance += money
-            users[i].user_id.save()
+                money = amount - round(amount/number_of_paying_users, 2)
+            user.balance += money
+            user.save()
+            user.user_id.balance += money
+            user.user_id.save()
         else:
-            money = amount / number_of_paying_users
-            users[i].balance -= money
-            users[i].save()
-            users[i].user_id.balance -= money
-            users[i].user_id.save()
+            money = round(amount/number_of_paying_users, 2)
+            user.balance -= money
+            user.save()
+            user.user_id.balance -= money
+            user.user_id.save()
 
 
 class CostEditView(LoginRequiredMixin, UpdateView):
@@ -287,27 +308,42 @@ class MakePaymentView(LoginRequiredMixin, CreateView):
         group = Group.objects.get(id=self.kwargs["group_id"])
         current_user_group = GroupUser.objects.get(user_id=current_user, group_id=group)
 
-        if current_user_group.balance < form.instance.amount:
-            messages.error(self.request, "Za dużo przelewasz!")
-            return redirect("group_list")
+        if current_user_group.balance >= 0:
+            messages.error(self.request, "Nie możesz zapłacić, będąc na plusie!")
+            return HttpResponseRedirect(reverse("group_view", args=(group.id,)))
+
+        if form.instance.amount > -current_user_group.balance or form.instance.amount < 0:
+            messages.error(self.request, "Podałeś złą kwotę!")
+            return HttpResponseRedirect(self.request.META.get('HTTP_REFERER'))
 
         distribute_money(form.instance.amount, group)
 
         form.instance.group_id = group
         form.instance.user_id = current_user
-        current_user_group.balance -= form.instance.amount
+        current_user_group.balance += form.instance.amount
         current_user_group.save()
-        return super().form_valid(form)
+        current_user.balance += form.instance.amount
+        current_user.save()
+        messages.success(self.request, f"Spłacono {form.instance.amount}!")
+        return HttpResponseRedirect(reverse("group_view", args=(group.id,)))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_balance = GroupUser.objects.get(group_id=self.kwargs["group_id"], user_id=self.request.user.profile)
+        context["user_balance"] = user_balance
+        return context
 
 
 def distribute_money(amount, group):
     for user in rates_of_distribution(group):
-        user[0].balance = round(user[0].balance+(amount*user[1]), 2)
+        user[0].balance = round(user[0].balance-(amount*user[1]), 2)
         user[0].save()
+        user[0].user_id.balance = round(user[0].user_id.balance-(amount*user[1]), 2)
+        user[0].user_id.save()
 
 
 def rates_of_distribution(group):
-    users = users_with_negative_balance(group)
+    users = users_with_positive_balance(group)
     sum_of_money = sum_of_money_owned(group)
     rates = []
     for user in users:
@@ -317,10 +353,19 @@ def rates_of_distribution(group):
 
 def sum_of_money_owned(group):
     sum_of_money = 0
-    for user in users_with_negative_balance(group):
+    for user in users_with_positive_balance(group):
         sum_of_money += (-user.balance)
     return sum_of_money
 
 
-def users_with_negative_balance(group):
-    return GroupUser.objects.filter(group_id=group, balance__lt=0)
+def users_with_positive_balance(group):
+    return GroupUser.objects.filter(group_id=group, balance__gt=0)
+
+
+def costs_and_payments_view(request):
+    context = {}
+    context["costs"] = CostUser.objects.filter(user_id=request.user.profile)
+    context["payments"] = Payment.objects.filter(user_id=request.user.profile)
+    template = "user_history.html"
+
+    return render(request, template_name=template, context=context)

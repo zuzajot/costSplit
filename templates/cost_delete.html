@@ -7,7 +7,9 @@
     <h2> Delete Post</h2>
         <form action="" method="post">{% csrf_token %}
             <p>Are you sure to delete? "{{cost.title}}"</p>
-            <input type="submit" value="Delete" />
+            <div class="link">
+                <input type="submit" value="usuń wydatek" /></div>
         </form>
-<p> <a href="{% url 'group_view' %}">Powrót do poprzedniej strony </a></p>
+<div class="link">
+    <a href="javascript:history.back();">powrót do grupy</A></div>
 {% endblock %}
