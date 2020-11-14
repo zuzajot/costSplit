@@ -331,7 +331,9 @@ class MakePaymentView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         user_balance = GroupUser.objects.get(group_id=self.kwargs["group_id"], user_id=self.request.user.profile)
         context["user_balance"] = user_balance
+        context["creditors"] = users_with_positive_balance(self.kwargs["group_id"])
         return context
+
 
 
 def distribute_money(amount, group):
