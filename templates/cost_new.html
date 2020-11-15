@@ -29,6 +29,19 @@ nowy wydatek?
          </tr>
 {% endfor %}
 </table>
+ <details>
+            <summary><b>przeliczyć z waluty?</b></summary>
+     <table style="width: 60%;"><tr>
+         <td style="width: 50%;"><input type="number" name="amountO" value="0.0" step="0.01" required="" id="id_amount_waluty" oninput="przelicz()"></td>
+                <td><select name="group_id" required="" id="wybrana_waluta" oninput="przelicz()">
+                    {% for waluta in currencies %}
+                    <option value="{{waluta.code}}">{{waluta.code}} {{waluta.rate}}</option>
+                    {% endfor %}
+
+                </select></tr></table></td>
+        </details>
+
+
 
     <div class="group-detail" style="margin-top: 15px; margin-bottom: -10px"> z kim?</div>
 
@@ -49,5 +62,26 @@ nowy wydatek?
 <script>
 document.querySelector('[for="id_title"]').innerHTML = "co?";
 document.querySelector('[for="id_amount"]').innerHTML = "za ile?";
+
+var amount = document.getElementById('id_amount');
+var amount_waluty = document.getElementById('id_amount_waluty');
+
+
+var waluty = {};
+
+{% for waluta in currencies %}
+waluty['{{waluta.code}}'] = parseFloat('{{waluta.rate}}'.replace(",","."));
+{% endfor %}
+
+function round2(number){
+    return Number(Math.round(number+ 'e+2') + 'e-2');
+}
+function przelicz(){
+    var waluta = document.getElementById('wybrana_waluta');
+    var kurs = waluty[waluta.value];
+    amount.value = round2(amount_waluty.value * kurs);
+}
+
+
 </script>
 {% endblock %}

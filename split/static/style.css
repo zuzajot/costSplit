@@ -33,9 +33,6 @@ a:link, a:visited {
     flex: 1;
 }
 
-
-
-
 .balance {
     color: #FFFF05;
 }
@@ -91,7 +88,8 @@ textarea:-webkit-autofill:hover,
 textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
-select:-webkit-autofill:focus  {
+select:-webkit-autofill:focus,
+select{
     border: 0;
     background-color: transparent !important;
     color: #D4DBF5;
@@ -131,14 +129,14 @@ button {
   font-size: 1em;
     font-family: Mukta;
     font-weight: 700;
-    letter-spacing: 0.02em
+    letter-spacing: 0.02em;
 }
-
 
 
 label {
         font-weight: 700;
 font-size-adjust: 40px;
+    font-size: 1.5em;
 }
 
 .twoje-grupy{
@@ -169,7 +167,10 @@ h1 {
     margin-top: 44px;
 }
 
-
+.link > input[type=submit]{
+    border: none;
+    width: initial;
+}
 
 .title-group-name, h1{
     font-size: 2.25em;
@@ -243,4 +244,12 @@ h1 {
   -webkit-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
+}
+
+select{
+ transform: translate(0,0px);
+}
+
+ul {
+    margin-top: 0px;
 }

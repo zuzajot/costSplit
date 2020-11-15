@@ -67,11 +67,6 @@
             </div>
 <div class="link"> <a href="{% url 'cost_new' group.id %}">+ dodaj wydatek</a>  </div>
 
-<form type='get' action="/cost" style ="margin:0">
-    <label for="search_box">Wyszukiwarka wydatków</label>
-    <input id="search_box" type="text" name="search_box" placeholder="Search"/>
-    <button id="search_submit" type="submit">Wyszukaj</button>
-</form>
 
 {# wydatki i płatności #}
         <div class="group-detail">
@@ -97,10 +92,10 @@
                    <td>{{ cost.cost_id.payer_id.user.username }}</td>
                    <td>
 <!--                   </a>-->
-                       {% if cost.cost_id.payer_id.user == user %}
-                    <a href="{% url 'cost_edit' cost.cost_id.id %}"    style="font-size: 0.4em; line-height: 10px">edytuj </a>
-                    <a href="{% url 'cost_delete' cost.cost_id.id %}"  style="font-size: 0.4em; line-height: 10px">usuń</a>
-                       {% endif %}
+<!--                 {#  to chyba tylko w szczegulach dam    {% if cost.cost_id.payer_id.user == user %}-->
+<!--                    <a href="{% url 'cost_edit' cost.cost_id.id %}"    style="font-size: 0.4em; line-height: 10px">edytuj </a>-->
+<!--                    <a href="{% url 'cost_delete' cost.cost_id.id %}"  style="font-size: 0.4em; line-height: 10px">usuń</a>-->
+<!--                       {% endif %} #}-->
                     <a href="{% url 'cost_view' cost.cost_id.id %}"  style="font-size: 0.4em; line-height: 10px">szczegóły</a>
                    </td>
                 </tr>
