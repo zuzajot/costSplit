@@ -177,18 +177,15 @@ class GroupDeleteView(LoginRequiredMixin, DeleteView):
 
 
 def convert_currency():
-    response = requests.get('http://api.nbp.pl/api/exchangerates/tables/B')
+    response = requests.get('http://api.nbp.pl/api/exchangerates/tables/A')
     curr = response.json()
-    curr = curr[0]['rates'][0]
+    curr = curr[0]['rates']
     waluty = Currency.objects.all()
-    for currency in waluty:
+    for waluta in waluty:
         for cur in curr:
-            cur = eval(cur)
-            print(currency)
-            print(cur)
-            if currency.code == cur['code']:
-                currency.rate = cur.get('mid')
-                currency.save()
+            if waluta.code == cur['code']:
+                waluta.rate = cur.get('mid')
+                waluta.save()
                 break
 
 
