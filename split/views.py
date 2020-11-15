@@ -298,6 +298,7 @@ class MakePaymentView(LoginRequiredMixin, CreateView):
         balance_updates.make_payment(group, form.instance.amount, current_user_group)
 
         messages.success(self.request, f"Spłacono {form.instance.amount}!")
+        form.instance.save()
         return HttpResponseRedirect(reverse("group_view", args=(group.id,)))
 
     def get_context_data(self, **kwargs):
