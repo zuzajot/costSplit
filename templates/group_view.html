@@ -67,12 +67,19 @@
             </div>
 <div class="link"> <a href="{% url 'cost_new' group.id %}">+ dodaj wydatek</a>  </div>
 
-
+<form type='get' action="/cost" style ="margin:0">
+    <label for="search_box">Wyszukiwarka wydatków</label>
+    <input id="search_box" type="text" name="search_box" placeholder="Search"/>
+    <button id="search_submit" type="submit">Wyszukaj</button>
+</form>
 
 {# wydatki i płatności #}
         <div class="group-detail">
             <span>spis akcji </span>
         </div>
+<p></p>
+
+
 
         <table style="width: 100%; margin-top: 60px">
 

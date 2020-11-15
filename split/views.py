@@ -78,7 +78,7 @@ class CostEditView(LoginRequiredMixin, UpdateView):
 class CostDeleteView(LoginRequiredMixin, DeleteView):
     model = Cost
     template_name = 'cost_delete.html'
-    success_url = '/cost'
+    success_url = '/groups'
 
 
 class CostDetailView(DetailView):
@@ -197,6 +197,7 @@ class GroupDeleteView(LoginRequiredMixin, DeleteView):
 class CostCreateView(LoginRequiredMixin, CreateView):
     model = Cost
     template_name = 'cost_new.html'
+    success_url = '/groups'
     fields = [
         "title",
         "amount",
