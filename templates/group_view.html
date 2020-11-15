@@ -16,7 +16,8 @@
         {% if group.admin_id == request.user.profile %}
         <details>
             <summary><b>usunąć grupe?</b></summary>
-            <a href="{% url 'group_delete' group.id %}">usuń teraz</a>
+            <div class="link">
+            <a href="{% url 'group_delete' group.id %}">usuń teraz</a></div>
         </details>
         {% endif %}
 
@@ -24,11 +25,21 @@
 {# członkowie #}
         <details>
           <summary><b>członkowie</b></summary>
-         <ul>
-            {% for user in users_in_group %}
-            <li>{{ user.user_id.user.username }}</li>
-            {% endfor %}
-        </ul>
+
+       <table style="width: 100%; margin-bottom: 30px;">
+           {% for user in users_in_group %}
+           <td width="50%">{{ user.user_id.user.username }}</td>
+           <td><b>      {% if user.balance > 0 %}      <span class="balance">+{{ user.balance }}
+                        {% elif user.balance < 0 %}    <span class="balance-">{{ user.balance }}
+                        {% else %}                             <span class="balance0">{{ user.balance }}
+                        {% endif %}                            </span></b></td>
+
+        </tr>
+        {% endfor %}
+        </table>
+
+
+
         </details>
         <!--
         <b>członkowie:</b> {% for user in users_in_group %}{{ user.user_id.user.username }}, {% endfor %}
@@ -109,6 +120,39 @@
                 </tr>
                 {% endfor %}
         </table>
+<h2>widok sortowany po datach beta</h2>
+        <table style="width: 100%; margin-top: 60px">
+
+                <tr>
+                   <td><b>co?</b></td>
+                   <td style="width:20%"><b>ile?</b></td>
+                   <td style="width:20%"><b>kto?</b></td>
+                   <td style="width:10%"><b>  </b></td>
+               </tr>
+
+                {% for action in joned %}
+               <tr>
+                   <td>{{ action.name }}</td>
+                   <td>
+                       {% if action.name == "spłata" %}
+                       <span class="balance"><b>{{ action.amount }}</b></span>
+                       {% else %}
+                       <span class="balance-"><b>{{ action.amount }}</b></span>
+                       {% endif %}
+
+                   </td>
+                   <td>{{ action.user_id.user.username }}</td>
+                   <td>
+                       {% if action.name == "spłata" %}
+                       {% else %}
+                       <a href="{% url 'cost_view' action.all.cost_id.id %}"  style="font-size: 0.4em; line-height: 10px">szczegóły</a>
+                       {% endif %}
+                   </td>
+                </tr>
+                {% endfor %}
+        </table>
+
+
      <h1>
          <a href="{% url 'leave_group' current_user_in_group.id %}"  style="font-size: 0.4em; line-height: 10px">opuść</a>
     </h1>

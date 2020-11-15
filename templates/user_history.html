@@ -16,38 +16,35 @@
 
 <h2>Wydatki:</h2>
  <table style="width: 100%; margin-top: -50px">
-                <tr>
-                   <td style="width:40%"><b>co?</b></td>
-                   <td style="width:20%"><b>za ile?</b></td>
-                    <td style="width:30%"><b>grupa</b></td>
-               </tr>
-                {% for cost in costs %}
-               <tr>
-
-                   <td>{{ cost.cost_id.title }}</td>
-                   <td><span class="balance-"><b>{{ cost.cost_id.amount }}</b></span></td>
-                   <td>{{ cost.cost_id.group_id }}</td>
-                </tr>
-                {% endfor %}
-        </table>
+        <tr>
+           <td style="width:40%"><b>co?</b></td>
+           <td style="width:20%"><b>za ile?</b></td>
+            <td style="width:30%"><b>grupa</b></td>
+       </tr>
+        {% for cost in costs %}
+       <tr>
+           <td>{{ cost.cost_id.title }}</td>
+           <td><span class="balance-"><b>{{ cost.cost_id.amount }}</b></span></td>
+           <td>{{ cost.cost_id.group_id }}</td>
+        </tr>
+        {% endfor %}
+</table>
 
 <h2>Spłaty:</h2>
-
  <table style="width: 100%; margin-top: -50px">
-                <tr>
-                   <td style="width:40%"><b>grupa</b></td>
-                   <td style="width:20%"><b>kwota</b></td>
-                    <td style="width:30%"><b></b></td>
-               </tr>
-                {% for payment in payments %}
-               <tr>
-                   <td>{{ payment.group_id }}</td>
-                   <td><span class="balance"><b>{{ payment.amount }}</b></span></td>
-                   </tr>
-                   {% endfor %}
+        <tr>
+           <td style="width:40%"><b>grupa</b></td>
+           <td style="width:20%"><b>kwota</b></td>
+            <td style="width:30%"><b></b></td>
+       </tr>
+        {% for payment in payments %}
+       <tr>
+           <td>{{ payment.group_id }}</td>
+           <td><span class="balance"><b>{{ payment.amount }}</b></span></td>
 
-
-        </table>
+           </tr>
+           {% endfor %}
+ </table>
 
 
 {% endblock %}

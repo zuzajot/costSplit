@@ -115,7 +115,7 @@ class CreateGroupView(LoginRequiredMixin, CreateView):
                 continue
             return invite_url
 
-
+from itertools import chain
 @login_required()
 def group_view(request, group_id):
     context = {}
@@ -125,6 +125,12 @@ def group_view(request, group_id):
     context["balance"] = GroupUser.objects.get(user_id=request.user.profile, group_id=group_id)
     context["users_in_group"] = GroupUser.objects.filter(group_id=group_id)
     context["current_user_in_group"] = GroupUser.objects.get(group_id=group_id, user_id=request.user.profile)
+    joned = []
+    for pay in context["payments"]:
+        joned.append({"name":"spłata",            "user_id":pay.user_id,   "date":pay.date,          "amount":pay.amount, 'all':pay})
+    for cost in context["user_costs"]:
+        joned.append({"name":cost.cost_id.title, "user_id":cost.user_id,  "date":cost.cost_id.date, "amount":cost.cost_id.amount,'all':cost})
+    context["joned"] =     _soreted = sorted(joned,key=lambda x:x["all"].pk, reverse=True)
     template = "group_view.html"
 
     return render(request, template_name=template, context=context)
