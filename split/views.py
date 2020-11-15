@@ -12,7 +12,7 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView
 
 from .forms import SignUpForm
-from .models import Profile, Group, GroupUser, Cost, CostUser, Payment
+from .models import Profile, Group, GroupUser, Cost, CostUser, Payment, Currency
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -232,6 +232,7 @@ class CostCreateView(LoginRequiredMixin, CreateView):
         group = Group.objects.get(id=self.kwargs["group_id"])
         context["group_users"] = GroupUser.objects.filter(group_id=group)
         context["group"] = group
+        context['currencies'] = Currency.objects.all()
         return context
 
 

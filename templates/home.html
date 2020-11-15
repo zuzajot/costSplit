@@ -3,6 +3,8 @@
 
 {% block title %} Strona główna {% endblock %}
 
+
+
 {% block content %}
         {% if user.is_authenticated %}
 
@@ -12,8 +14,9 @@
     {% else %}
 
 
-
 <h2>logujemy?</h2>
+
+
         <form method="POST">
         {% csrf_token %}
         <table style="width: 70%; margin-top: 40px">
