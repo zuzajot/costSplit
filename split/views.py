@@ -16,7 +16,7 @@ from .models import Profile, Group, GroupUser, Cost, CostUser, Payment
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.contrib import messages
-
+from forex_python.converter import CurrencyRates
 
 def login_request(request):
     if request.method == 'POST':
@@ -254,9 +254,6 @@ def distribute_cost_among_users(users, amount, creator):
             user.user_id.balance -= money
             user.user_id.save()
 
-# def currency_converter(amount, currency):
-#     amount =
-
 
 class CostEditView(LoginRequiredMixin, UpdateView):
     model = Cost
@@ -375,3 +372,11 @@ def costs_and_payments_view(request):
     template = "user_history.html"
 
     return render(request, template_name=template, context=context)
+
+
+def currency_converter():
+    currency = CurrencyRates()
+    if Group.group_currency != Cost.currency:
+        new_amount = currency.get_rate(Cost.currency, Group.group_currency, Cost.amount)
+        Cost.amount = new_amount
+    return Cost.amount
