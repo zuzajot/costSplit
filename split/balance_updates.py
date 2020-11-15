@@ -109,7 +109,7 @@ def _update_users_group_balances(group):
         for user_cost in models.CostUser.objects.filter(user_id=group_user.user_id):
             group_user_balance += user_cost.cost_id.amount / _number_of_users_involved_in_cost(user_cost.cost_id)
         for cost in models.Cost.objects.filter(payer_id=group_user.user_id):
-            group_user_balance -= cost.amount
+            group_user_balance += cost.amount
 
         group_user.balance = group_user_balance
         group_user.save()
