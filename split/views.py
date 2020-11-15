@@ -239,9 +239,14 @@ class CostDeleteView(LoginRequiredMixin, DeleteView):
         return reverse('group_view', kwargs={'group_id': self.object.group_id.id})
 
     def delete(self, request, *args, **kwargs):
-        balance_updates.delete_cost(self.get_object())
         messages.success(self.request, "Usunięto wydatek!")
-        return super().delete(self, request, *args, **kwargs)
+
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        self.object.delete()
+
+        balance_updates.delete_cost(self.get_object())
+        return HttpResponseRedirect(reverse('group_view', kwargs={'group_id': self.object.group_id.id}))
 
     def dispatch(self, request, *args, **kwargs):
         cost = self.get_object()
