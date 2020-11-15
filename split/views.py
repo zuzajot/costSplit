@@ -194,6 +194,10 @@ class GroupDeleteView(LoginRequiredMixin, DeleteView):
         return super(GroupDeleteView, self).dispatch(request, *args, **kwargs)
 
 
+class CurrencyUpdate(UpdateView):
+    pass
+
+
 class CostCreateView(LoginRequiredMixin, CreateView):
     model = Cost
     template_name = 'cost_new.html'
