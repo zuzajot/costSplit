@@ -75,3 +75,6 @@ class Currency(models.Model):
     code = models.CharField(max_length=3)
     rate = models.FloatField()
     date = models.DateField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.code} - {self.rate} - {self.date}"

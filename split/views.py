@@ -17,9 +17,6 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.contrib import messages
 
-from forex_python.converter import CurrencyRates
-#from openexchangerate import OpenExchangeRates
-
 
 def login_request(request):
     if request.method == 'POST':
