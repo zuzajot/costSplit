@@ -71,3 +71,7 @@ class Payment(models.Model):
         return f"{self.user_id} - {self.group_id} - {self.amount}"
 
 
+class Currency(models.Model):
+    code = models.CharField(max_length=3)
+    rate = models.FloatField()
+    date = models.DateField(default=timezone.now)
