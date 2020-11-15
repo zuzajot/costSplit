@@ -57,8 +57,32 @@ def _distribute_cost_among_users(users, amount, payer):
             group_user.save()
 
 
-def delete_cost(cost_users):
-    pass
+def delete_cost(cost):
+    cost_users = models.CostUser.objects.filter(cost_id=cost)
+    payer = models.GroupUser.objects.get(user_id=cost.payer_id, group_id=cost.group_id)
+    returned_to_payer = False
+    for cost_user in cost_users:
+        if cost_user.user_id is cost.payer_id:
+            _return_to_payer(payer, cost.amount, len(cost_users), involved=True)
+            returned_to_payer = True
+            continue
+        group_user = models.GroupUser.objects.get(user_id=cost_user.user_id, group_id=cost.group_id)
+        group_user.balance += (cost.amount / len(cost_users))
+        group_user.save()
+
+    if not returned_to_payer:
+        _return_to_payer(payer, cost.amount)
+
+    _update_users_global_balances(cost.group_id)
+
+
+def _return_to_payer(payer, amount, number_of_payers=1, involved=False):
+    if payer is not involved:
+        money = amount
+    else:
+        money = amount - (amount / number_of_payers)
+    payer.balance -= money
+    payer.save()
 
 
 def _update_users_global_balances(group):
@@ -68,6 +92,4 @@ def _update_users_global_balances(group):
         for user_group in user_groups:
             global_user_balance += user_group.balance
         group_user.user_id.balance = global_user_balance
-        # print(f"group_user: {group_user}")
-        # print(f"Profil: {group_user.user_id}, Bilans: {group_user.user_id.balance}")
-        group_user.save()
+        group_user.user_id.save()

@@ -62,12 +62,6 @@ class CostEditView(LoginRequiredMixin, UpdateView):
     success_url = '/cost'
 
 
-class CostDeleteView(LoginRequiredMixin, DeleteView):
-    model = Cost
-    template_name = 'cost_delete.html'
-    success_url = '/cost'
-
-
 class CostDetailView(DetailView):
     model = Cost
     template_name = 'cost_view.html'
@@ -205,7 +199,6 @@ class CostCreateView(LoginRequiredMixin, CreateView):
 
         balance_updates.create_cost(form.instance, self.request.POST.getlist('payers'), group)
 
-
         return HttpResponseRedirect(reverse("group_view", args=(group.id,)))
 
     def get_context_data(self, **kwargs):
@@ -224,7 +217,7 @@ class CostDeleteView(LoginRequiredMixin, DeleteView):
         return reverse('group_view', kwargs={'group_id': self.object.group_id.id})
 
     def delete(self, request, *args, **kwargs):
-        revert_users_balance(self.get_object())
+        balance_updates.delete_cost(self.get_object())
         messages.success(self.request, "Usunięto wydatek!")
         return super().delete(self, request, *args, **kwargs)
 
@@ -235,37 +228,6 @@ class CostDeleteView(LoginRequiredMixin, DeleteView):
             return redirect("group_list")
 
         return super().dispatch(request, *args, **kwargs)
-
-
-def revert_users_balance(cost):
-    cost_users = CostUser.objects.filter(cost_id=cost)
-    amount = cost.amount
-    returned_to_payer = False
-    for cost_user in cost_users:
-        if cost_user.user_id is cost.payer_id:
-            payer = GroupUser.objects.get(user_id=cost_user.user_id, group_id=cost.group_id)
-            return_to_payer(payer, amount, len(cost_users), involved=True)
-            returned_to_payer = True
-            continue
-        group_user = GroupUser.objects.get(user_id=cost_user.user_id, group_id=cost.group_id)
-        group_user.balance += (amount / len(cost_users))
-        group_user.save()
-        group_user.user_id.balance += (amount / len(cost_users))
-        group_user.user_id.save()
-
-    if not returned_to_payer:
-        return_to_payer(GroupUser.objects.get(user_id=cost.payer_id, group_id=cost.group_id), amount)
-
-
-def return_to_payer(payer, amount, number_of_payers=1, involved=False):
-    if payer is not involved:
-        money = amount
-    else:
-        money = amount - (amount / number_of_payers)
-    payer.balance -= money
-    payer.save()
-    payer.user_id.balance -= money
-    payer.user_id.save()
 
 
 class PasswordReset(PasswordResetView):
