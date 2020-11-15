@@ -1,6 +1,7 @@
 import random
 import string
 
+import requests
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -181,6 +182,19 @@ class GroupDeleteView(LoginRequiredMixin, DeleteView):
         return super(GroupDeleteView, self).dispatch(request, *args, **kwargs)
 
 
+def convert_currency():
+    response = requests.get('http://api.nbp.pl/api/exchangerates/tables/A')
+    curr = response.json()
+    curr = curr[0]['rates']
+    waluty = Currency.objects.all()
+    for waluta in waluty:
+        for cur in curr:
+            if waluta.code == cur['code']:
+                waluta.rate = cur.get('mid')
+                waluta.save()
+                break
+
+
 class CostCreateView(LoginRequiredMixin, CreateView):
     model = Cost
     template_name = 'cost_new.html'
@@ -213,6 +227,7 @@ class CostCreateView(LoginRequiredMixin, CreateView):
         context["group_users"] = GroupUser.objects.filter(group_id=group)
         context["group"] = group
         context['currencies'] = Currency.objects.all()
+        convert_currency()
         return context
 
 
@@ -289,6 +304,7 @@ class MakePaymentView(LoginRequiredMixin, CreateView):
         balance_updates.make_payment(group, form.instance.amount, current_user_group)
 
         messages.success(self.request, f"Spłacono {form.instance.amount}!")
+        form.instance.save()
         return HttpResponseRedirect(reverse("group_view", args=(group.id,)))
 
     def get_context_data(self, **kwargs):
