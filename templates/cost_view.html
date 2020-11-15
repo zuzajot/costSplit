@@ -6,19 +6,22 @@
 
         <h1>{{cost.title}}</h1>
 <b>kwota:</b> <span class="balance">{{cost.amount}}</span><br>
+
 <b>płacący:</b> {{ cost.payer_id }}<br>
+<b>data:</b> {{cost.date}}<br>
 <b>grupa:</b> {{ cost.group_id }}<br>
-<b>uczestnicy kosztu:</b><br>
-        {% for user in cost_users %}
-        <ul><li>{{ user.user_id }}</li></ul>
-        {% endfor %}
-        <p>Data utworzenia: {{cost.date}}</p>
-        <p>Waluta: {{cost.currency}}</p>
+<b>uczestnicy kosztu:</b>
+         <ul style="margin-top: 0px;">{% for user in cost_users %}
+       <li>{{ user.user_id }}</li>
+        {% endfor %}</ul>
+
+<!--        <p>Waluta: {{cost.currency}}</p>-->
 
 
 {% if cost.payer_id.user == user %}
-<div class="link">
-<a href="{% url 'cost_edit' cost.id %}">Edytuj wydatek </a></div>
+
+<!--<div class="link">-->
+<!--<a href="{% url 'cost_edit' cost.id %}">Edytuj wydatek </a></div>-->
 <div class="link">
 <a href="{% url 'cost_delete' cost.id %}">Usuń wydatek </a></div>
 {% endif %}

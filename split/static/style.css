@@ -91,7 +91,8 @@ textarea:-webkit-autofill:hover,
 textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
-select:-webkit-autofill:focus  {
+select:-webkit-autofill:focus,
+select{
     border: 0;
     background-color: transparent !important;
     color: #D4DBF5;
@@ -243,4 +244,8 @@ h1 {
   -webkit-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
+}
+
+select{
+ transform: translate(0,0px);
 }
