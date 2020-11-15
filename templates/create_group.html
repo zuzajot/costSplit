@@ -4,16 +4,16 @@
 
 {% block content %}
 
-    <h1>chcesz dodać grupe?</h1>
+    <h1>Chcesz dodać grupę?</h1>
     <form action="" method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Add"/>
+        <input type="submit" value="Dodaj"/>
     </form>
 
 
 <script>
-document.querySelector('[for="id_name"]').innerHTML = "nazwa";
-document.querySelector('[for="id_currency"]').innerHTML = "waluta rozliczeń";
+document.querySelector('[for="id_name"]').innerHTML = "nazwa grupy";
+document.querySelector('[for="id_group_currency"]').innerHTML = "waluta rozliczeń";
 </script>
 {% endblock %}

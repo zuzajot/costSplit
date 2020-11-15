@@ -16,7 +16,10 @@ from .models import Profile, Group, GroupUser, Cost, CostUser, Payment
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.contrib import messages
+
 from forex_python.converter import CurrencyRates
+#from openexchangerate import OpenExchangeRates
+
 
 def login_request(request):
     if request.method == 'POST':
@@ -234,6 +237,16 @@ class CostCreateView(LoginRequiredMixin, CreateView):
         context["group_users"] = GroupUser.objects.filter(group_id=group)
         context["group"] = group
         return context
+
+    def currency_converter(self, form):
+        form.instance.payer_id = self.request.user.profile
+        group = Group.objects.get(id=self.kwargs["group_id"])
+        curr = CurrencyRates()
+        if form.instance.currency != group.group_currency:
+            form.instance.amount = curr.convert(group.group_currency, form.instance.currency, form.instance.amount)
+            form.instance.save()
+
+    # client = OpenExchangeRates(api_key="c03c2beb8f254b95982bb9bc59f6077e")
 
 
 def distribute_cost_among_users(users, amount, creator):
@@ -458,9 +471,4 @@ class LeaveGroup(LoginRequiredMixin, DeleteView):
         return super().delete(self, request, *args, **kwargs)
 
 
-def currency_converter():
-    currency = CurrencyRates()
-    if Group.group_currency != Cost.currency:
-        new_amount = currency.get_rate(Cost.currency, Group.group_currency, Cost.amount)
-        Cost.amount = new_amount
-    return Cost.amount
+
