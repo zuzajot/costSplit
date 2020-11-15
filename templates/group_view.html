@@ -90,8 +90,10 @@
                    <td>{{ cost.cost_id.payer_id.user.username }}</td>
                    <td>
 <!--                   </a>-->
+                       {% if cost.cost_id.payer_id.user == user %}
                     <a href="{% url 'cost_edit' cost.cost_id.id %}"    style="font-size: 0.4em; line-height: 10px">edytuj </a>
                     <a href="{% url 'cost_delete' cost.cost_id.id %}"  style="font-size: 0.4em; line-height: 10px">usuń</a>
+                       {% endif %}
                     <a href="{% url 'cost_view' cost.cost_id.id %}"  style="font-size: 0.4em; line-height: 10px">szczegóły</a>
                    </td>
                 </tr>
@@ -105,7 +107,8 @@
                 </tr>
                 {% endfor %}
         </table>
-
-
+     <h1>
+         <a href="{% url 'leave_group' current_user_in_group.id %}"  style="font-size: 0.4em; line-height: 10px">opuść</a>
+    </h1>
 
 {% endblock %}

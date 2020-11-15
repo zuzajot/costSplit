@@ -146,6 +146,17 @@ font-size-adjust: 40px;
     margin-bottom: 44px;
 }
 
+h2 {
+    font-size: 1.5em;
+    font-weight: 400;
+    margin-bottom: 54px;
+}
+h1 {
+    font-size: 1.5em;
+    font-weight: 800;
+    margin-bottom: 54px;
+}
+
 .new-group-link, .link{
     font-size: 1.5em;
     font-weight: 800;

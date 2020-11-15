@@ -3,7 +3,11 @@
 {% block title %} Nowy wydatek {% endblock %}
 
 {% block content %}
-<!--TODO: Dodać miejsce na wiadomości (o złej kwocie albo za małej liczbie płacących)-->
+{% if messages %}
+{% for message in messages %}
+<p>{{ message }}</p>
+{% endfor %}
+{% endif %}
 <div class="title-group-name">{{ group.name }}</div>
 <div class="group-detail">
 dodajemy wydatek?
