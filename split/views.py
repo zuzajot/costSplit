@@ -120,7 +120,7 @@ class GroupListView(LoginRequiredMixin, ListView):
 class CreateGroupView(LoginRequiredMixin, CreateView):
     template_name = "create_group.html"
     model = Group
-    fields = ["name", 'group_currency']
+    fields = ["name"]
 
     def form_valid(self, form):
         form.instance.admin_id = self.request.user.profile
@@ -204,7 +204,6 @@ class CostCreateView(LoginRequiredMixin, CreateView):
     fields = [
         "title",
         "amount",
-        'currency'
     ]
 
     def form_valid(self, form):
@@ -237,16 +236,6 @@ class CostCreateView(LoginRequiredMixin, CreateView):
         context["group_users"] = GroupUser.objects.filter(group_id=group)
         context["group"] = group
         return context
-
-    def currency_converter(self, form):
-        form.instance.payer_id = self.request.user.profile
-        group = Group.objects.get(id=self.kwargs["group_id"])
-        curr = CurrencyRates()
-        if form.instance.currency != group.group_currency:
-            form.instance.amount = curr.convert(group.group_currency, form.instance.currency, form.instance.amount)
-            form.instance.save()
-
-    # client = OpenExchangeRates(api_key="c03c2beb8f254b95982bb9bc59f6077e")
 
 
 def distribute_cost_among_users(users, amount, creator):
