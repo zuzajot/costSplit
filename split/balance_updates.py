@@ -7,6 +7,8 @@ def make_payment(group, amount, paying_user_group):
         group_user[0].save()
     paying_user_group.balance += amount
     paying_user_group.save()
+
+    _update_users_group_balances(group)
     _update_users_global_balances(group)
 
 
@@ -37,6 +39,8 @@ def create_cost(cost, id_of_users_involved, group):
         models.CostUser(user_id=user, cost_id=cost).save()
         users_involved.append(models.GroupUser.objects.get(user_id=user, group_id=group))
     _distribute_cost_among_users(users_involved, cost.amount, users_involved[0])
+
+    _update_users_group_balances(group)
     _update_users_global_balances(group)
 
 
@@ -73,6 +77,7 @@ def delete_cost(cost):
     if not returned_to_payer:
         _return_to_payer(payer, cost.amount)
 
+    _update_users_group_balances(cost.group_id)
     _update_users_global_balances(cost.group_id)
 
 
@@ -93,3 +98,22 @@ def _update_users_global_balances(group):
             global_user_balance += user_group.balance
         group_user.user_id.balance = global_user_balance
         group_user.user_id.save()
+
+
+def _update_users_group_balances(group):
+    group_users = models.GroupUser.objects.filter(group_id=group)
+    for group_user in group_users:
+        group_user_balance = 0
+        for user_payment in models.Payment.objects.filter(user_id=group_user.user_id):
+            group_user_balance -= user_payment.amount
+        for user_cost in models.CostUser.objects.filter(user_id=group_user.user_id):
+            group_user_balance += user_cost.cost_id.amount / _number_of_users_involved_in_cost(user_cost.cost_id)
+        for cost in models.Cost.objects.filter(payer_id=group_user.user_id):
+            group_user_balance -= cost.amount
+
+        group_user.balance = group_user_balance
+        group_user.save()
+
+
+def _number_of_users_involved_in_cost(cost):
+    return len(models.CostUser.objects.filter(cost_id=cost))
