@@ -1,6 +1,7 @@
 import random
 import string
 
+import requests
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -175,8 +176,20 @@ class GroupDeleteView(LoginRequiredMixin, DeleteView):
         return super(GroupDeleteView, self).dispatch(request, *args, **kwargs)
 
 
-class CurrencyUpdate(UpdateView):
-    pass
+def convert_currency():
+    response = requests.get('http://api.nbp.pl/api/exchangerates/tables/B')
+    curr = response.json()
+    curr = curr[0]['rates'][0]
+    waluty = Currency.objects.all()
+    for currency in waluty:
+        for cur in curr:
+            cur = eval(cur)
+            print(currency)
+            print(cur)
+            if currency.code == cur['code']:
+                currency.rate = cur.get('mid')
+                currency.save()
+                break
 
 
 class CostCreateView(LoginRequiredMixin, CreateView):
@@ -211,6 +224,7 @@ class CostCreateView(LoginRequiredMixin, CreateView):
         context["group_users"] = GroupUser.objects.filter(group_id=group)
         context["group"] = group
         context['currencies'] = Currency.objects.all()
+        convert_currency()
         return context
 
 
