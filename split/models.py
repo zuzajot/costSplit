@@ -9,7 +9,7 @@ from django.utils import timezone
 
 class Profile(models.Model):
     user = models.OneToOneField(User,  on_delete=models.CASCADE)
-    balance = models.FloatField(default=0.0)
+    balance = models.DecimalField(max_digits=14, decimal_places=2, default=0.0000)
 
     def __str__(self):
         return self.user.username
@@ -34,7 +34,7 @@ class Group(models.Model):
 class GroupUser(models.Model):
     group_id = models.ForeignKey("Group", on_delete=models.CASCADE)
     user_id = models.ForeignKey("Profile", on_delete=models.CASCADE)
-    balance = models.FloatField(default=0.0)
+    balance = models.DecimalField(max_digits=14, decimal_places=2, default=0.0000)
 
     def __str__(self):
         return f"{self.group_id} - {self.user_id} - {self.balance}"
@@ -42,11 +42,12 @@ class GroupUser(models.Model):
 
 class Cost(models.Model):
     title = models.CharField(max_length=100)
-    amount = models.FloatField()
+    amount = models.DecimalField(max_digits=14, decimal_places=2, default=0.0000)
     payer_id = models.ForeignKey("Profile", on_delete=models.DO_NOTHING)
     group_id = models.ForeignKey("Group", on_delete=models.CASCADE)
     users = models.ManyToManyField("Profile", related_name="cost_users_many_to_many")
     date = models.DateField(default=timezone.now)
+
 
     def __str__(self):
         return f"{self.title} - {self.amount} - {self.payer_id} - {self.group_id}"
@@ -61,7 +62,7 @@ class CostUser(models.Model):
 
 
 class Payment(models.Model):
-    amount = models.FloatField()
+    amount = models.DecimalField(max_digits=14, decimal_places=2, default=0.0000)
     group_id = models.ForeignKey("Group", on_delete=models.CASCADE)
     user_id = models.ForeignKey("Profile", on_delete=models.CASCADE)
     date = models.DateField(default=timezone.now)

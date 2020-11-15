@@ -13,6 +13,7 @@
         <ul><li>{{ user.user_id }}</li></ul>
         {% endfor %}
         <p>Data utworzenia: {{cost.date}}</p>
+        <p>Waluta: {{cost.currency}}</p>
 
 
 {% if cost.payer_id.user == user %}
@@ -23,3 +24,5 @@
 {% endif %}
 
 {% endblock %}
+
+<!--TODO:dadac tu trzeba cos-->

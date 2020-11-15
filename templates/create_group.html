@@ -4,11 +4,15 @@
 
 {% block content %}
 
-    <h1>chcesz dodać grupę?</h1>
+    <h1>Chcesz dodać grupę?</h1>
     <form action="" method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Add"/>
+        <input type="submit" value="Dodaj"/>
     </form>
 
+
+<script>
+document.querySelector('[for="id_name"]').innerHTML = "nazwa grupy";
+</script>
 {% endblock %}

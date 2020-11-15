@@ -17,6 +17,9 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.contrib import messages
 
+from forex_python.converter import CurrencyRates
+#from openexchangerate import OpenExchangeRates
+
 
 def login_request(request):
     if request.method == 'POST':
@@ -236,20 +239,20 @@ class CostCreateView(LoginRequiredMixin, CreateView):
 
 
 def distribute_cost_among_users(users, amount, creator):
-    number_of_paying_users = len(users) - 1
+    number_of_paying_users = len(users)-1
     users = list(set(users))
     for user in users:
         if user is creator:
             if len(users) > number_of_paying_users:
                 money = amount
             else:
-                money = amount - round(amount / number_of_paying_users, 2)
+                money = amount - round(amount/number_of_paying_users, 2)
             user.balance += money
             user.save()
             user.user_id.balance += money
             user.user_id.save()
         else:
-            money = round(amount / number_of_paying_users, 2)
+            money = round(amount/number_of_paying_users, 2)
             user.balance -= money
             user.save()
             user.user_id.balance -= money
@@ -396,6 +399,7 @@ class MakePaymentView(LoginRequiredMixin, CreateView):
         return context
 
 
+
 def distribute_money(amount, group):
     for user in rates_of_distribution(group):
         user[0].balance = round(user[0].balance-(amount*user[1]), 2)
@@ -409,7 +413,7 @@ def rates_of_distribution(group):
     sum_of_money = sum_of_money_owned(group)
     rates = []
     for user in users:
-        rates.append((user, (-user.balance) / sum_of_money))
+        rates.append((user, (-user.balance)/sum_of_money))
     return rates
 
 
@@ -454,4 +458,6 @@ class LeaveGroup(LoginRequiredMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, "Opuszczono grupę!")
         return super().delete(self, request, *args, **kwargs)
+
+
 

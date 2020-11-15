@@ -6,7 +6,7 @@
 {% block content %}
         {% if user.is_authenticated %}
 
-            <div> <p> Hi {{ user.username }}! <a href="{% url 'logout' %}">Wyoguj się</a> </p></div>
+            <div> <p> Hi {{ user.username }}! <a href="{% url 'logout' %}">Wyloguj się</a> </p></div>
 
             <div class="groupmain"><a href="{% url 'group_list' %}">Twoje grupy</a></div>
     {% else %}
