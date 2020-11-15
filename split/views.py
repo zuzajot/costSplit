@@ -16,6 +16,8 @@ from .models import Profile, Group, GroupUser, Cost, CostUser, Payment
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
 
+from . import balance_updates
+
 
 def login_request(request):
     if request.method == 'POST':
@@ -51,20 +53,6 @@ def signup(request):
 
 class LogoutView(LogoutView):
     template_name = 'home.html'
-
-
-class CostCreateView(LoginRequiredMixin, CreateView):
-    model = Cost
-    template_name = 'cost_new.html'
-    success_url = reverse_lazy('group_view')
-
-    def get_form_kwargs(self):
-        """ Passes the request object to the form class.
-         This is necessary to only display members that belong to a given user"""
-
-        kwargs = super(CostCreateView, self).get_form_kwargs()
-        kwargs['request'] = self.request
-        return kwargs
 
 
 class CostEditView(LoginRequiredMixin, UpdateView):
@@ -215,13 +203,8 @@ class CostCreateView(LoginRequiredMixin, CreateView):
         form.instance.group_id = group
         form.instance.save()
 
-        creator = GroupUser.objects.get(user_id=self.request.user.profile, group_id=group)
-        users_involved = [creator]
-        for user_id in self.request.POST.getlist('payers'):
-            user = Profile.objects.get(id=user_id)
-            CostUser(user_id=user, cost_id=form.instance).save()
-            users_involved.append(GroupUser.objects.get(user_id=user, group_id=group))
-        distribute_cost_among_users(users_involved, form.instance.amount, creator)
+        balance_updates.create_cost(form.instance, self.request.POST.getlist('payers'), group)
+
 
         return HttpResponseRedirect(reverse("group_view", args=(group.id,)))
 
@@ -231,47 +214,6 @@ class CostCreateView(LoginRequiredMixin, CreateView):
         context["group_users"] = GroupUser.objects.filter(group_id=group)
         context["group"] = group
         return context
-
-
-def distribute_cost_among_users(users, amount, creator):
-    number_of_paying_users = len(users) - 1
-    users = list(set(users))
-    for user in users:
-        if user is creator:
-            if len(users) > number_of_paying_users:
-                money = amount
-            else:
-                money = amount - round(amount / number_of_paying_users, 2)
-            user.balance += money
-            user.save()
-            user.user_id.balance += money
-            user.user_id.save()
-        else:
-            money = round(amount / number_of_paying_users, 2)
-            user.balance -= money
-            user.save()
-            user.user_id.balance -= money
-            user.user_id.save()
-
-# class CostEditView(LoginRequiredMixin, UpdateView):
-#     model = Cost
-#     template_name = 'cost_edit.html'
-#     fields = '__all__'
-#
-#     def dispatch(self, request, *args, **kwargs):
-#         cost = self.get_object()
-#         if not cost.payer_id == self.request.user.profile:
-#             messages.error(self.request, "Chyba zabłądziłeś przyjacielu")
-#             return redirect("group_list")
-#
-#         messages.success(self.request, "Usunięto wydatek!")
-#         return super().dispatch(request, *args, **kwargs)
-#
-#     def get_success_url(self):
-#         pass
-#
-#     def form_valid(self, form):
-#         pass
 
 
 class CostDeleteView(LoginRequiredMixin, DeleteView):
@@ -375,14 +317,8 @@ class MakePaymentView(LoginRequiredMixin, CreateView):
             messages.error(self.request, "Podałeś złą kwotę!")
             return HttpResponseRedirect(self.request.META.get('HTTP_REFERER'))
 
-        distribute_money(form.instance.amount, group)
+        balance_updates.make_payment(group, form.instance.amount, current_user_group)
 
-        form.instance.group_id = group
-        form.instance.user_id = current_user
-        current_user_group.balance += form.instance.amount
-        current_user_group.save()
-        current_user.balance += form.instance.amount
-        current_user.save()
         messages.success(self.request, f"Spłacono {form.instance.amount}!")
         return HttpResponseRedirect(reverse("group_view", args=(group.id,)))
 
@@ -392,34 +328,6 @@ class MakePaymentView(LoginRequiredMixin, CreateView):
         context["user_balance"] = user_balance
         context["creditors"] = GroupUser.objects.filter(group_id=self.kwargs["group_id"], balance__gt=0)
         return context
-
-
-def distribute_money(amount, group):
-    for user in rates_of_distribution(group):
-        user[0].balance = round(user[0].balance - (amount * user[1]), 2)
-        user[0].save()
-        user[0].user_id.balance = round(user[0].user_id.balance - (amount * user[1]), 2)
-        user[0].user_id.save()
-
-
-def rates_of_distribution(group):
-    users = users_with_positive_balance(group)
-    sum_of_money = sum_of_money_owned(group)
-    rates = []
-    for user in users:
-        rates.append((user, (-user.balance) / sum_of_money))
-    return rates
-
-
-def sum_of_money_owned(group):
-    sum_of_money = 0
-    for user in users_with_positive_balance(group):
-        sum_of_money += (-user.balance)
-    return sum_of_money
-
-
-def users_with_positive_balance(group):
-    return GroupUser.objects.filter(group_id=group, balance__gt=0)
 
 
 def costs_and_payments_view(request):
@@ -452,4 +360,3 @@ class LeaveGroup(LoginRequiredMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, "Opuszczono grupę!")
         return super().delete(self, request, *args, **kwargs)
-
