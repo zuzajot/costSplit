@@ -34,10 +34,8 @@ nowy wydatek?
      <table style="width: 60%;"><tr>
          <td style="width: 50%;"><input type="number" name="amountO" value="0.0" step="0.01" required="" id="id_amount_waluty" oninput="przelicz()"></td>
                 <td><select name="group_id" required="" id="wybrana_waluta" oninput="przelicz()">
-                  <option value="EUR">Euro 4.4</option>
-                  <option value="USD">USD 3.5</option>
-                    {% for wluta in waluty %}
-                    <option value="{{waluta.name}}">{{waluta.name}} {{waluta.kurs}}</option>
+                    {% for waluta in currencies %}
+                    <option value="{{waluta.code}}">{{waluta.code}} {{waluta.rate}}</option>
                     {% endfor %}
 
                 </select></tr></table></td>
@@ -70,12 +68,9 @@ var amount_waluty = document.getElementById('id_amount_waluty');
 
 
 var waluty = {};
-waluty['USD'] = 3.55;
-waluty['EUR'] = 4.21;
 
-
-{% for wluta in waluty %}
-waluty['{{waluta.name}}'] = {{waluta.kurs}};
+{% for waluta in currencies %}
+waluty['{{waluta.code}}'] = parseFloat('{{waluta.rate}}'.replace(",","."));
 {% endfor %}
 
 function round2(number){

@@ -11,7 +11,7 @@
 <b>data:</b> {{cost.date}}<br>
 <b>grupa:</b> {{ cost.group_id }}<br>
 <b>uczestnicy kosztu:</b>
-         <ul style="margin-top: 0px;">{% for user in cost_users %}
+         <ul>{% for user in cost_users %}
        <li>{{ user.user_id }}</li>
         {% endfor %}</ul>
 

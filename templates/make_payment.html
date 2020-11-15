@@ -8,12 +8,12 @@
         <form action="" method="post" oninput="przelicz()">
             {% csrf_token %}
 {# Pola formularza #}
-        <table style="width: 60%; margin-top: 40px">
+        <table style="width: 100%; margin-top: 40px">
         {% for field in form %}
                  <tr style="height: 95px">
-                     <td style="width:30%">{{ field.errors }}{{ field.label_tag }}</td>
-                     <td>{{ field }}</td>
-                     <td> </td>
+                     <td style="width:20%">{{ field.errors }}{{ field.label_tag }}</td>
+                     <td style="width:35%">{{ field }}</td>
+                     <td><button type="button" onclick="amount.value = round2(max_amount);">spłać wszystko</button> </td>
                      {% if field.help_text %}
                         <td><p class="help">{{ field.help_text|safe }}</p></td>
                       {% endif %}
@@ -24,7 +24,7 @@
     <table style="width: 100%;">
                 <tr>
                      <td style="width:30%"><b>komu?</b></td>
-                     <td style="width:30%"><b>ile?</b></td>
+                     <td style="width:25%"><b>ile?</b></td>
                     <td><b>ile będziesz dłużny?</b></td>
                  </tr>
         {% for creditor in creditors %}
@@ -37,12 +37,12 @@
       </table>
 {# wysłanie formularza #}
             <div class="link">
-                <input type="submit" value="ureguluj"/></div>
+                <input type="submit" value="- ureguluj"/></div>
         </form>
 
 
 
-<button onclick="amount.value = round2(max_amount);">wszystko</button>
+
 {# "Wróc" #}
           <div class="link">
               <button onclick="history.back()">wróć</button></div>
@@ -64,7 +64,7 @@ amount.value = round2(max_amount);
 
 var creditors = [];
 {% for creditor in creditors %}
-var _value = parseFloat({{creditor.balance}})
+var _value = parseFloat('{{creditor.balance}}'.replace(",","."));
 creditors.push(["{{creditor.user_id.user.id}}","{{creditor.user_id.user.id}}zostalo", _value]);
 {% endfor %}
 
