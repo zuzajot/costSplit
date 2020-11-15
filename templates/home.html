@@ -6,7 +6,7 @@
 {% block content %}
         {% if user.is_authenticated %}
 
-            <div> <p> Hi {{ user.username }}! <a href="{% url 'logout' %}">Log Out</a> </p></div>
+            <div> <p> Hi {{ user.username }}! <a href="{% url 'logout' %}">Wyoguj się</a> </p></div>
 
             <div class="groupmain"><a href="{% url 'group_list' %}">Twoje grupy</a></div>
     {% else %}
@@ -29,7 +29,7 @@
          </table>
 
 <div class="link">
-    <button type ="submit">zaloguj</button></div>
+    <button type ="submit">Zaloguj się</button></div>
     </form>
 
             <p> </p>
@@ -41,7 +41,7 @@
 
 <script>
 document.querySelector('[for="id_username"]').innerHTML = "nazwa";
-document.querySelector('[for="id_password"]').innerHTML = "haslo";
+document.querySelector('[for="id_password"]').innerHTML = "hasło";
 </script>
     {% endif %}
 
