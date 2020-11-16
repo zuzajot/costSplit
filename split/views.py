@@ -235,18 +235,15 @@ class CostDeleteView(LoginRequiredMixin, DeleteView):
     model = Cost
     template_name = 'cost_delete.html'
 
-    def get_success_url(self):
-        return reverse('group_view', kwargs={'group_id': self.object.group_id.id})
-
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, "Usunięto wydatek!")
 
-        self.object = self.get_object()
-        success_url = self.get_success_url()
-        self.object.delete()
+        cost = self.get_object()
+        self.get_object().delete()
 
-        balance_updates.delete_cost(self.get_object())
-        return HttpResponseRedirect(reverse('group_view', kwargs={'group_id': self.object.group_id.id}))
+        balance_updates.delete_cost(cost)
+
+        return HttpResponseRedirect(reverse('group_view', kwargs={'group_id': cost.group_id.id}))
 
     def dispatch(self, request, *args, **kwargs):
         cost = self.get_object()
@@ -306,10 +303,13 @@ class MakePaymentView(LoginRequiredMixin, CreateView):
             messages.error(self.request, "Podałeś złą kwotę!")
             return HttpResponseRedirect(self.request.META.get('HTTP_REFERER'))
 
-        balance_updates.make_payment(group, form.instance.amount, current_user_group)
-
         messages.success(self.request, f"Spłacono {form.instance.amount}!")
+        form.instance.group_id = group
+        form.instance.user_id = current_user
         form.instance.save()
+
+        balance_updates.make_payment(group, form.instance)
+
         return HttpResponseRedirect(reverse("group_view", args=(group.id,)))
 
     def get_context_data(self, **kwargs):

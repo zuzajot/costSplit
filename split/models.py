@@ -78,3 +78,10 @@ class Currency(models.Model):
 
     def __str__(self):
         return f"{self.code} - {self.rate} - {self.date}"
+
+
+class PaymentUser(models.Model):
+    payment_id = models.ForeignKey("Payment", on_delete=models.CASCADE)
+    user_id = models.ForeignKey("Profile", on_delete=models.DO_NOTHING)
+    rate = models.DecimalField(max_digits=100, decimal_places=90)
+
