@@ -7,6 +7,10 @@
 
 {% block content %}
 
+{% if 'inv' in request.GET.next %}
+  Zaloguj się lub zarejestruj, aby dołączyć do grupy!
+{% endif %}
+
         {% if user.is_authenticated %}
 
             <div> <p> Hi {{ user.username }}! <a href="{% url 'logout' %}">Wyloguj się</a> </p></div>
