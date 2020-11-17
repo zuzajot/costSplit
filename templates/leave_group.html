@@ -3,10 +3,12 @@
 {% block title %} Cost Split twoje grupy {% endblock %}
 
 {% block content %}
-    <h2> Delete Post</h2>
+    <h2> Opuść grupę </h2>
         <form action="" method="post">{% csrf_token %}
-            <p>Na pewno chcesz opuścić "{{user_group.group_id.name}}"?</p>
-            <input type="submit" value="Opuść" />
+            <p>Czy na pewno chcesz opuścić grupę?</p>
+            <div class="link">
+                <input type="submit" value="opuść" /></div>
         </form>
-<p> <a href="{% url 'group_list' %}">Powrót do twoich grup </a></p>
+<div class="link">
+    <a href="javascript:history.back();">powrót do grupy</A></div>
 {% endblock %}

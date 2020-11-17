@@ -4,9 +4,9 @@
 
 {% block content %}
 
-    <h2> Delete Post</h2>
+    <h2> Usuń wydatek</h2>
         <form action="" method="post">{% csrf_token %}
-            <p>Are you sure to delete? "{{cost.title}}"</p>
+            <p>Czy na pewno chcesz usunąć wydatek "{{cost.title}}"?</p>
             <div class="link">
                 <input type="submit" value="usuń wydatek" /></div>
         </form>

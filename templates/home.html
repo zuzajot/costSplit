@@ -6,6 +6,7 @@
 
 
 {% block content %}
+
         {% if user.is_authenticated %}
 
             <div> <p> Hi {{ user.username }}! <a href="{% url 'logout' %}">Wyloguj się</a> </p></div>
@@ -14,8 +15,7 @@
     {% else %}
 
 
-<h2>logujemy?</h2>
-
+<h2>Zaloguj się:</h2>
 
         <form method="POST">
         {% csrf_token %}
@@ -28,17 +28,22 @@
                         <td><p class="help">{{ field.help_text|safe }}</p></td>
                       {% endif %}
                 </tr>
-            {% endfor %}
-         </table>
 
+
+            {% endfor %}
+
+         </table>
+{% if request.GET.next %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+            {% endif %}
 <div class="link">
-    <button type ="submit">Zaloguj się</button></div>
+    <button type ="submit">Zaloguj</button></div>
     </form>
 
             <p> </p>
 
             <p><a href="{% url 'password_reset' %}">Nie pamiętam hasła</a></p>
-            <p>Nie posiadasz konta? <a href="{% url 'signup' %}">Zarejestruj się!</a> </p>
+            <p><a href="{% url 'signup' %}">Nie posiadasz konta? Zarejestruj się!</a> </p>
 
 
 

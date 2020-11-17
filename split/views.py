@@ -23,15 +23,12 @@ from . import balance_updates
 def login_request(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
-        print(form)
-
         if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return HttpResponseRedirect("/groups")
+            user = form.get_user()
+            login(request, user)
+            if 'next' in request.POST:
+                return redirect(request.POST.get('next'))
+            return HttpResponseRedirect("/groups")
     else:
         form = AuthenticationForm()
     return render(request, 'home.html', {'form': form})

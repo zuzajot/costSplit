@@ -48,7 +48,6 @@ class Cost(models.Model):
     users = models.ManyToManyField("Profile", related_name="cost_users_many_to_many")
     date = models.DateField(default=timezone.now)
 
-
     def __str__(self):
         return f"{self.title} - {self.amount} - {self.payer_id} - {self.group_id}"
 
