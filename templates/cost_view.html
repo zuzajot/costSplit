@@ -23,9 +23,10 @@
 <!--<div class="link">-->
 <!--<a href="{% url 'cost_edit' cost.id %}">Edytuj wydatek </a></div>-->
 <div class="link">
-<a href="{% url 'cost_delete' cost.id %}">Usuń wydatek </a></div>
+<a href="{% url 'cost_delete' cost.id %}">usuń wydatek </a></div>
 {% endif %}
-
+<div class="link">
+    <a href="javascript:history.back();">powrót do grupy</A></div>
 {% endblock %}
 
 <!--TODO:dadac tu trzeba cos-->

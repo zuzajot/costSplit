@@ -120,41 +120,11 @@
                 </tr>
                 {% endfor %}
         </table>
-<h2>widok sortowany po datach beta</h2>
-        <table style="width: 100%; margin-top: 60px">
-
-                <tr>
-                   <td><b>co?</b></td>
-                   <td style="width:20%"><b>ile?</b></td>
-                   <td style="width:20%"><b>kto?</b></td>
-                   <td style="width:10%"><b>  </b></td>
-               </tr>
-
-                {% for action in joned %}
-               <tr>
-                   <td>{{ action.name }}</td>
-                   <td>
-                       {% if action.name == "spłata" %}
-                       <span class="balance"><b>{{ action.amount }}</b></span>
-                       {% else %}
-                       <span class="balance-"><b>{{ action.amount }}</b></span>
-                       {% endif %}
-
-                   </td>
-                   <td>{{ action.user_id.user.username }}</td>
-                   <td>
-                       {% if action.name == "spłata" %}
-                       {% else %}
-                       <a href="{% url 'cost_view' action.all.cost_id.id %}"  style="font-size: 0.4em; line-height: 10px">szczegóły</a>
-                       {% endif %}
-                   </td>
-                </tr>
-                {% endfor %}
-        </table>
 
 
      <h1>
-         <a href="{% url 'leave_group' current_user_in_group.id %}"  style="font-size: 0.4em; line-height: 10px">opuść</a>
-    </h1>
-
+         <a href="{% url 'leave_group' current_user_in_group.id %}"  style="font-size: 0.4em; line-height: 10px">opuść grupę</a>
+         <br>
+    <a href="{% url 'group_list' %}" style="font-size: 0.4em; line-height: 10px" >powrót do listy grup</A>
+         </h1>
 {% endblock %}
