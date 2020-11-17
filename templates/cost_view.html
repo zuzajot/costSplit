@@ -3,14 +3,30 @@
 {% block title %} {{cost.title}}{% endblock %}
 
 {% block content %}
-    <div class="Cost">
-        <h2>Wydatek: {{cost.title}}</h2>
-        <p>Kwota: {{cost.amount}}</p>
-        <p>Płacący: {{ cost.payer_id }}</p>
-        <p>Grupa: {{ cost.group_id }}</p>
-        <p>Uczestnicy kosztu: {{costuser.user.username}} </p>
-        <p> <a href="{% url 'cost_edit' cost.id %}">Edytuj wydatek </a></p>
-        <p> <a href="{% url 'cost_delete' cost.id %}">Usuń wydatek </a></p>
-    </div>
 
+        <h1>{{cost.title}}</h1>
+<b>kwota:</b> <span class="balance">{{cost.amount}}</span><br>
+
+<b>płacący:</b> {{ cost.payer_id }}<br>
+<b>data:</b> {{cost.date}}<br>
+<b>grupa:</b> {{ cost.group_id }}<br>
+<b>uczestnicy kosztu:</b>
+         <ul>{% for user in cost_users %}
+       <li>{{ user.user_id }}</li>
+        {% endfor %}</ul>
+
+<!--        <p>Waluta: {{cost.currency}}</p>-->
+
+
+{% if cost.payer_id.user == user %}
+
+<!--<div class="link">-->
+<!--<a href="{% url 'cost_edit' cost.id %}">Edytuj wydatek </a></div>-->
+<div class="link">
+<a href="{% url 'cost_delete' cost.id %}">usuń wydatek </a></div>
+{% endif %}
+<div class="link">
+    <a href="javascript:history.back();">powrót do grupy</A></div>
 {% endblock %}
+
+<!--TODO:dadac tu trzeba cos-->

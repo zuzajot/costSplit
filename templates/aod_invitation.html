@@ -1,16 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>invitation test</title>
-</head>
-<body>
-<h1>Nazwa grupy: {{ group.name }}</h1>
-  <form action="" method="post">
+{% extends 'base.html' %}
+
+{% block title %} dołączasz do grupy? {% endblock %}
+
+{% block content %}
+
+
+{% if messages %}
+{% for message in messages %}
+<p>{{ message }}</p>
+{% endfor %}
+{% endif %}
+<span class="infooo">
+    Zostałeś zaproszony przez {{ group.admin_id.user.username}} do grupy „{{ group.name }}"! <br> Przyjmujesz zaproszenie?</br>
+</span>
+
+
+  <form action="" method="post" class="form-class">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Sign me up!" name="yes"/>
-        <input type="submit" value="Get me back!" name="no"/>
+        <input type="submit" value="tak!" name="yes"/>
+        <input type="submit" value="nie!" name="no"/>
     </form>
-</body>
-</html>
+
+{% endblock %}

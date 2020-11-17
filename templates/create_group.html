@@ -1,15 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>create group test</title>
-</head>
-<body>
-    <h1>Dodawanie</h1>
+{% extends 'base.html' %}
+
+{% block title %} Cost Split dodaj grupe{% endblock %}
+
+{% block content %}
+
+    <h1>Chcesz dodać grupę?</h1>
     <form action="" method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Add"/>
+                <table style="width: 60%; margin-top: 40px">
+        {% for field in form %}
+                 <tr style="height: 95px">
+                     <td style="width:30%">{{ field.errors }}{{ field.label_tag }}</td>
+                     <td>{{ field }}</td>
+                     <td> </td>
+                     {% if field.help_text %}
+                        <td><p class="help">{{ field.help_text|safe }}</p></td>
+                      {% endif %}
+                 </tr>
+        {% endfor %}
+        </table>
+        <div class="link">
+        <input type="submit" value="+ dodaj"/></div>
     </form>
-</body>
-</html>
+
+
+<script>
+document.querySelector('[for="id_name"]').innerHTML = "nazwa";
+</script>
+{% endblock %}

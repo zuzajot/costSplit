@@ -1,0 +1,61 @@
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: 
+ =?utf-8?q?Reset_has=C5=82a_dla_konta_na_stronie_127=2E0=2E0=2E1=3A8000?=
+From: webmaster@localhost
+To: zuza@gmail.com
+Date: Sat, 07 Nov 2020 20:21:27 -0000
+Message-ID: <160478048714.2604.711777244911542778@DESKTOP-S895MUG.home>
+
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Forgot Your Password?</title>
+
+    <link rel="stylesheet" type="text/css" href="/static/style.css"/>
+</head>
+<body>
+
+
+<div class="top-bar">
+    <a href="/">
+    <img src="/static/img/logo.png" alt ="CS logo" height="70px">
+        </a>
+    
+    <div class="userinfodiv">
+        <span class="userinfo">Hej,
+           zuza
+
+
+      <span class="balance">+20,0
+
+            </span>
+
+
+
+
+
+         <a href="/logout/">wyloguj</a></span>
+    </div>
+    
+</div>
+
+<div id="content" class="content">
+    
+  <h1>Forgot your password?</h1>
+  <p>Enter your email address below, and we'll email instructions for setting a new one.</p>
+
+  <form method="POST">
+    
+    
+    <input type="submit" value="Send me instructions!">
+  </form>
+
+</div>
+</body>
+</html>
+
+-------------------------------------------------------------------------------

@@ -12,19 +12,20 @@
 {% endfor %}
 {% endif %}
 
+<h2> twoje grupy: </h2>
+
 {% for group in groups %}
 
 <a href="{% url 'group_view' group.group_id.id %} ">
     <div class="group-bar">
-
         <span class="group-name">{{ group.group_id.name }}</span>
-
         <div class="balance-in-group">
-{% if group.balance > 0 %}      <span class="balance">+{{ group.balance }}
-{% elif group.balance < 0 %}    <span class="balance-">−{{ group.balance }}
-{% else %}                      <span class="balance">{{ group.balance }}
+
+{% if group.balance > 0 %}      <span class="balance">  +{{ group.balance }}
+{% elif group.balance < 0 %}    <span class="balance-"> {{ group.balance }}
+{% else %}                      <span class="balance0">  jesteś kwita
 {% endif %}
-            </span>
+                                </span>
         </div>
                          {# <p>{{ request.META.HTTP_HOST }}/inv/{{ group.group_id.invite_url }}</p> <p>{{ group.user_id.user.username }}</p>#}
 
@@ -33,6 +34,9 @@
 
 {% endfor %}
 
-<a href="{% url 'group_create' %}"> Dodaj nową grupę </a>
+<div class="new-group-link">
+<a href="{% url 'group_create' %}"> + dodaj grupę </a>
+</div>
 
+<a href="{% url 'user_history' %}"> Historia wydatków i spłat </a>
 {% endblock %}

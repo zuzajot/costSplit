@@ -17,19 +17,17 @@ a:link, a:visited {
   text-decoration: none;
 }
 
-
 .top-bar {
     max-width: 1200px;
     margin: 50px auto;
     display: flex;
-    font-weight: 800;
+    font-weight: 700;
 }
 
 .userinfo {
-
 }
 
-.userinfodiv, .balance-in-group {
+.userinfodiv, .balance-in-group, .new-group-link, .link {
     display: flex;
     justify-content: flex-end;
     flex: 1;
@@ -42,47 +40,83 @@ a:link, a:visited {
 .balance- {
     color: #8D07F6;
 }
-
-
-.group-bar {
+.balance0 {
+    color: #00c500;
+}
+.group-bar, .group-detail {
     display: flex;
-        font-size: 1.5em;
-        font-weight: 800;
-        color: #D4DBF5 ;
+    font-size: 1.5em;
+    font-weight: 700;
+    color: #D4DBF5 ;
+    margin-top: -5px;
+}
+.group-detail{
+    font-size: 1.5em;
+    font-weight: 300;
+    margin-top: 70px;
+    margin-bottom: -30px;
+}
 
+.infooo {
+    font-size: 1.5em;
+    font-weight: 300;
+    margin-top: 70px;
+    margin-bottom: 30px;
 }
 
 .group-name{
-
 }
 
 .balance-in-group {
-
 }
-.balance{}
-input {
+.form-class{
+        margin: 100px auto;
+        width: 90%;
+        display: flex;
+}
 
+
+
+.balance{}
+
+input,
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select{
     border: 0;
-    background-color: transparent;
+    background-color: transparent !important;
     color: #D4DBF5;
     font-size: 1em;
-    font-weight: 800;
-    border-bottom: 2px solid #D4DBF5;
+    font-weight: 700;
+    border-bottom: 4px solid #D4DBF5;
     margin-left: 10px;
-    width: 290px;
-
+    width: 100%;
 }
+
+
+input[type=submit]:hover, a:hover, button:hover {
+  -webkit-transform: rotate(-10deg) !important;
+  -ms-transform: rotate(-10deg) !important;
+  transform: rotate(-10deg);
+}
+
 :focus{
     outline: none;
 }
-
-
 
 
 .content {
     max-width: 760px;
     margin: 90px auto;
 }
+
 
 button {
    background: none;
@@ -94,11 +128,128 @@ button {
   display: inline-block;
   font-size: 1em;
     font-family: Mukta;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+
+label {
+        font-weight: 700;
+font-size-adjust: 40px;
+    font-size: 1.5em;
+}
+
+.twoje-grupy{
+    font-size: 1.5em;
+    margin-bottom: 44px;
+}
+
+h2 {
+    font-size: 1.5em;
+    font-weight: 400;
+    margin-bottom: 54px;
+}
+h1 {
+    font-size: 1.5em;
     font-weight: 800;
-    letter-spacing: 0.02em
+    margin-bottom: 54px;
+}
+
+.new-group-link, .link{
+    font-size: 1.5em;
+    font-weight: 800;
+    margin-top: 44px;
+}
+
+.link{
+    font-size: 1.5em;
+    font-weight: 800;
+    margin-top: 44px;
+}
+
+.link > input[type=submit]{
+    border: none;
+    width: initial;
+}
+
+.title-group-name, h1{
+    font-size: 2.25em;
+    font-weight: 800;
+    margin-bottom: -10px;
+}
+
+.container {
+  display: block;
+  position: relative;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+        margin-bottom: -50px;
+}
+
+/* Hide the browser's default checkbox */
+.container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 15px;
+  right: 40%;
+  height: 35px;
+  width: 35px;
+  background-color: none;
+  border: solid;
 
 }
-label {
-        font-weight: 800;
-font-size-adjust: 40px;
+
+/* On mouse-over, add a grey background color */
+.container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.container input:checked ~ .checkmark {
+  background-color: none;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.container input:checked ~ .checkmark:after {
+  display: block;
+    background: none;
+}
+
+/* Style the checkmark/indicator */
+.container .checkmark:after {
+  left: 3px;
+  top: -39px;
+  width: 29px;
+  height: 48px;
+  border: solid #FFFF05;
+  border-width: 0 18px 18px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+select{
+ transform: translate(0,0px);
+}
+
+ul {
+    margin-top: 0px;
 }

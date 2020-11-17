@@ -1,14 +1,13 @@
 {% extends 'base.html' %}
 
-{% block title %} {{cost.title}} {% endblock %}
+{% block title %} Cost Split twoje grupy {% endblock %}
 
 {% block content %}
-
-    <h2> Usuń wydatek</h2>
+    <h2> Opuść grupę </h2>
         <form action="" method="post">{% csrf_token %}
-            <p>Czy na pewno chcesz usunąć wydatek "{{cost.title}}"?</p>
+            <p>Czy na pewno chcesz opuścić grupę?</p>
             <div class="link">
-                <input type="submit" value="usuń wydatek" /></div>
+                <input type="submit" value="opuść" /></div>
         </form>
 <div class="link">
     <a href="javascript:history.back();">powrót do grupy</A></div>

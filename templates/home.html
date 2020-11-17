@@ -3,24 +3,58 @@
 
 {% block title %} Strona główna {% endblock %}
 
+
+
 {% block content %}
+
+{% if 'inv' in request.GET.next %}
+  Zaloguj się lub zarejestruj, aby dołączyć do grupy!
+{% endif %}
+
         {% if user.is_authenticated %}
 
-            <div> <p> Hi {{ user.username }}! <a href="{% url 'logout' %}">Log Out</a> </p></div>
+            <div> <p> Hi {{ user.username }}! <a href="{% url 'logout' %}">Wyloguj się</a> </p></div>
 
             <div class="groupmain"><a href="{% url 'group_list' %}">Twoje grupy</a></div>
     {% else %}
-          <p>Jesteś niezalogowany</p>
+
+
+<h2>Zaloguj się:</h2>
+
         <form method="POST">
         {% csrf_token %}
-            {{form.as_p}}
-    <button type ="submit">Login</button>
+        <table style="width: 70%; margin-top: 40px">
+        {% for field in form %}
+                 <tr style="height: 95px">
+                     <td style="width:30%">{{ field.errors }}{{ field.label_tag }}</td>
+                     <td>{{ field }}</td>
+                     {% if field.help_text %}
+                        <td><p class="help">{{ field.help_text|safe }}</p></td>
+                      {% endif %}
+                </tr>
+
+
+            {% endfor %}
+
+         </table>
+{% if request.GET.next %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+            {% endif %}
+<div class="link">
+    <button type ="submit">Zaloguj</button></div>
     </form>
 
             <p> </p>
 
             <p><a href="{% url 'password_reset' %}">Nie pamiętam hasła</a></p>
-            <p>Nie posiadasz konta? <a href="{% url 'signup' %}">Zarejestruj się!</a> </p>
+            <p><a href="{% url 'signup' %}">Nie posiadasz konta? Zarejestruj się!</a> </p>
+
+
+
+<script>
+document.querySelector('[for="id_username"]').innerHTML = "nazwa";
+document.querySelector('[for="id_password"]').innerHTML = "hasło";
+</script>
     {% endif %}
 
 {% endblock %}
