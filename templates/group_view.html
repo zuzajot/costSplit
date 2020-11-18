@@ -15,7 +15,7 @@
 {# usun grupe #}
         {% if group.admin_id == request.user.profile %}
         <details>
-            <summary><b>usunąć grupe?</b></summary>
+            <summary><b>usunąć grupę?</b></summary>
             <div class="link">
             <a href="{% url 'group_delete' group.id %}">usuń teraz</a></div>
         </details>
@@ -98,16 +98,16 @@
                 {% for cost in user_costs %}
                <tr>
 <!--                   <a href="{% url 'cost_view' cost.id %}">-->
-                   <td>{{ cost.cost_id.title }}</td>
-                   <td><span class="balance-"><b>{{ cost.cost_id.amount }}</b></span></td>
-                   <td>{{ cost.cost_id.payer_id.user.username }}</td>
+                   <td>{{ cost.title }}</td>
+                   <td><span class="balance-"><b>{{ cost.amount }}</b></span></td>
+                   <td>{{ cost.payer_id.user.username }}</td>
                    <td>
 <!--                   </a>-->
 <!--                 {#  to chyba tylko w szczegulach dam    {% if cost.cost_id.payer_id.user == user %}-->
 <!--                    <a href="{% url 'cost_edit' cost.cost_id.id %}"    style="font-size: 0.4em; line-height: 10px">edytuj </a>-->
 <!--                    <a href="{% url 'cost_delete' cost.cost_id.id %}"  style="font-size: 0.4em; line-height: 10px">usuń</a>-->
 <!--                       {% endif %} #}-->
-                    <a href="{% url 'cost_view' cost.cost_id.id %}"  style="font-size: 0.4em; line-height: 10px">szczegóły</a>
+                    <a href="{% url 'cost_view' cost.id %}"  style="font-size: 0.4em; line-height: 10px">szczegóły</a>
                    </td>
                 </tr>
                 {% endfor %}

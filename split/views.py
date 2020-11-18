@@ -119,18 +119,26 @@ def group_view(request, group_id):
     context = {}
     context["group"] = get_object_or_404(Group, pk=group_id)
     context["payments"] = Payment.objects.filter(group_id=group_id)
-    context["user_costs"] = CostUser.objects.filter(user_id=request.user.profile, cost_id__group_id=group_id)
+    costs_user_paid = list(Cost.objects.filter(group_id=group_id))
+    user_costs = list(CostUser.objects.filter(user_id=request.user.profile, cost_id__group_id=group_id))
+    cost_list = costs_user_paid[:]
+    for user_cost in user_costs:
+        cost = user_cost.cost_id
+        if cost not in cost_list:
+            cost_list.append(cost)
+    context["user_costs"] = cost_list
     context["balance"] = GroupUser.objects.get(user_id=request.user.profile, group_id=group_id)
     context["users_in_group"] = GroupUser.objects.filter(group_id=group_id)
     context["current_user_in_group"] = GroupUser.objects.get(group_id=group_id, user_id=request.user.profile)
     joned = []
     for pay in context["payments"]:
-        joned.append({"name":"spłata",            "user_id":pay.user_id,   "date":pay.date,          "amount":pay.amount, 'all':pay})
+        joned.append({"name":"spłata",   "user_id":pay.user_id,   "date":pay.date,   "amount":pay.amount, 'all':pay})
     for cost in context["user_costs"]:
-        joned.append({"name":cost.cost_id.title, "user_id":cost.user_id,  "date":cost.cost_id.date, "amount":cost.cost_id.amount,'all':cost})
-    context["joned"] =     _soreted = sorted(joned,key=lambda x:x["all"].pk, reverse=True)
+        joned.append({"name":cost.title, "user_id":cost.payer_id,  "date":cost.date, "amount":cost.amount,'all':cost})
+    context["joned"] = sorted(joned,key=lambda x:x["date"], reverse=True)
+    for x in context["joned"]:
+        print(x)
     template = "group_view.html"
-
     return render(request, template_name=template, context=context)
 
 
