@@ -13,7 +13,7 @@
                  <tr style="height: 95px">
                      <td style="width:20%">{{ field.errors }}{{ field.label_tag }}</td>
                      <td style="width:35%">{{ field }}</td>
-                     <td><button type="button" onclick="amount.value = round2(max_amount);">spłać wszystko</button> </td>
+                     <td><button type="button" onclick="amount.value = round2(max_amount); przelicz()">spłać wszystko</button> </td>
                      {% if field.help_text %}
                         <td><p class="help">{{ field.help_text|safe }}</p></td>
                       {% endif %}
@@ -51,6 +51,10 @@
 function round2(number){
     return Number(Math.round(number+ 'e+2') + 'e-2');
 }
+function float_from_coma_separaotor(text){
+    return parseFloat(text.replace(",","."));
+}
+
 document.querySelector('[for="id_amount"]').innerHTML = "kwota:";
 var _str = "{{ user_balance.balance }}";
 var __str = _str.replace(",",".");
@@ -63,17 +67,23 @@ amount.max = round2(max_amount);
 amount.value = round2(max_amount);
 
 var creditors = [];
+var total_credit = 0
 {% for creditor in creditors %}
-var _value = parseFloat('{{creditor.balance}}'.replace(",","."));
-creditors.push(["{{creditor.user_id.user.id}}","{{creditor.user_id.user.id}}zostalo", _value]);
+var _value = float_from_coma_separaotor('{{creditor.balance}}');
+_dic = {};
+_dic['wplynie'] = document.getElementById("{{creditor.user_id.user.id}}");
+_dic['zostanie'] = document.getElementById("{{creditor.user_id.user.id}}zostalo");
+_dic['credit'] = _value;
+creditors.push(_dic);
+total_credit += _value;
 {% endfor %}
 
 function przelicz(){
     for (var creditor of creditors) {
-        var obj = document.getElementById(creditor[0]);
-        obj.innerHTML = Number(Math.round(creditor[2] * amount.value / max_amount + 'e+2') + 'e-2') ;
-        var obj2 = document.getElementById(creditor[1]);
-        obj2.innerHTML = Number(Math.round((creditor[2]-(creditor[2] * amount.value / max_amount ))+ 'e+2') + 'e-2');
+        var rating = creditor['credit'] / total_credit;
+        var now_amount = amount.value;
+        creditor['wplynie'].innerHTML = round2( now_amount * rating );
+        creditor['zostanie'].innerHTML = round2( max_amount * rating - now_amount * rating);
     }
 }
 przelicz();
