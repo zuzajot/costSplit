@@ -130,14 +130,12 @@ def group_view(request, group_id):
     context["balance"] = GroupUser.objects.get(user_id=request.user.profile, group_id=group_id)
     context["users_in_group"] = GroupUser.objects.filter(group_id=group_id)
     context["current_user_in_group"] = GroupUser.objects.get(group_id=group_id, user_id=request.user.profile)
-    joned = []
+    cost_and_paymant = []
     for pay in context["payments"]:
-        joned.append({"name":"spłata",   "user_id":pay.user_id,   "date":pay.date,   "amount":pay.amount, 'all':pay})
+        cost_and_paymant.append({"title":"Spłata",   "user_id":pay.user_id,   "date":pay.date,   "amount":pay.amount, 'obj':pay})
     for cost in context["user_costs"]:
-        joned.append({"name":cost.title, "user_id":cost.payer_id,  "date":cost.date, "amount":cost.amount,'all':cost})
-    context["joned"] = sorted(joned,key=lambda x:x["date"], reverse=True)
-    for x in context["joned"]:
-        print(x)
+        cost_and_paymant.append({"title":cost.title, "user_id":cost.payer_id,  "date":cost.date, "amount":cost.amount,'obj':cost})
+    context["cost_and_paymant"] = sorted(cost_and_paymant,key=lambda x:(x["date"],x["obj"].id), reverse=True)
     template = "group_view.html"
     return render(request, template_name=template, context=context)
 
