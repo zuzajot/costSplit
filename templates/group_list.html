@@ -39,4 +39,19 @@
 </div>
 
 <a href="{% url 'user_history' %}"> Historia wydatków i spłat </a>
+
+<h1 id="test_ws">HUJ KURWA HUJ</h1>
+
+
+<script language="javascript">
+    var ws_url = 'ws://' + window.location.host + '/groups/';
+    var ticksSocket = new WebSocket(ws_url);
+
+    ticksSocket.onmessage = function(event) {
+        var data = JSON.parse(event.data);
+        console.log('data', data);
+        document.getElementById("test_ws").innerHTML = data;
+    };
+</script>
 {% endblock %}
+

@@ -10,7 +10,7 @@ from django.contrib.auth.views import LogoutView, PasswordResetCompleteView, Pas
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
-from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView
+from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView, TemplateView
 
 from .forms import SignUpForm
 from .models import Profile, Group, GroupUser, Cost, CostUser, Payment, Currency
@@ -113,7 +113,7 @@ class CreateGroupView(LoginRequiredMixin, CreateView):
                 continue
             return invite_url
 
-from itertools import chain
+
 @login_required()
 def group_view(request, group_id):
     context = {}
@@ -355,3 +355,7 @@ class LeaveGroup(LoginRequiredMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, "Opuszczono grupę!")
         return super().delete(self, request, *args, **kwargs)
+
+
+class ChannelsView(TemplateView):
+    template_name = "whatever.html"
