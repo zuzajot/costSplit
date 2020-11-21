@@ -69,7 +69,7 @@ class CostDetailView(DetailView):
         current_user = request.user
         context = self.get_context_data()
 
-        users_involved = [self.object.payer_id]
+        users_involved = [self.object.payer_id.user]
         for cost_user in list(context["cost_users"]):
             users_involved.append(cost_user.user_id.user)
 
@@ -98,13 +98,6 @@ class CreateGroupView(LoginRequiredMixin, CreateView):
     model = Group
     fields = ["name"]
 
-    def form_valid(self, form):
-        form.instance.admin_id = self.request.user.profile
-        form.instance.invite_url = self.generate_unique_url(10)
-        form.instance.save()
-        GroupUser(user_id=self.request.user.profile, group_id=form.instance).save()
-        return HttpResponseRedirect(reverse("group_view", args=(form.instance.id,)))
-
     def generate_unique_url(self, length):
         urls = self.model.objects.all().values_list('invite_url', flat=True)
         while True:
@@ -112,6 +105,15 @@ class CreateGroupView(LoginRequiredMixin, CreateView):
             if invite_url in urls:
                 continue
             return invite_url
+
+    def form_valid(self, form):
+        form.instance.admin_id = self.request.user.profile
+        form.instance.invite_url = self.generate_unique_url(10)
+        form.instance.save()
+        GroupUser(user_id=self.request.user.profile, group_id=form.instance).save()
+        return HttpResponseRedirect(reverse("group_view", args=(form.instance.id,)))
+
+
 
 from itertools import chain
 @login_required()
